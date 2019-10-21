@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "start": "node app.js >> log.log 2>> err.log",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "python-setup": "python3 -m venv venv",
+    "python-install": "pip3 install -r requirements.txt",
+    "python-start": "source venv/bin/activate",
+    "python-stop": "deactivate"
   },
   "repository": {
     "type": "git",
