@@ -64,3 +64,4 @@ typings/
 venv
 data
 models/tree.joblib
+models/neural.joblib
