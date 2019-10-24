@@ -1,8 +1,8 @@
 
 # Import
 import tensorflow as tf
-import numpy as np
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 from joblib import dump
@@ -105,50 +105,45 @@ line2, = ax1.plot(y_test * 0.5)
 plt.show()
 
 # Fit neural net
-batch_size = 256
 mse_train = []
 mse_test = []
 
+saver = tf.compat.v1.train.Saver()
+
 # Run
 first = 1
-epochs = 10
-for e in range(epochs):
+e = 0
+while 1 == 1:
 
     # Shuffle training data
     shuffle_indices = np.random.permutation(np.arange(len(y_train)))
     X_train = X_train[shuffle_indices]
     y_train = y_train[shuffle_indices]
 
-    # Minibatch training
-    for i in range(0, len(y_train) // batch_size):
-        start = i * batch_size
-        batch_x = X_train[start:start + batch_size]
-        batch_y = y_train[start:start + batch_size]
-        # Run optimizer with batch
-        net.run(opt, feed_dict={X: batch_x, Y: batch_y})
+    net.run(opt, feed_dict={X: X_train, Y: y_train})
 
-        # Show progress
-        if np.mod(i, 50) == 0:
-            # MSE train and test
-            mse_train.append(net.run(mse, feed_dict={X: X_train, Y: y_train}))
-            mse_test.append(net.run(mse, feed_dict={X: X_test, Y: y_test}))
-            print('MSE Train: ', mse_train[-1])
-            print('MSE Test: ', mse_test[-1])
+    # MSE train and test
+    mse_train.append(net.run(mse, feed_dict={X: X_train, Y: y_train}))
+    mse_test.append(net.run(mse, feed_dict={X: X_test, Y: y_test}))
+    print('Epoch: ' + str(e))
+    print('MSE Train: ', mse_train[-1])
+    print('MSE Test: ', mse_test[-1])
 
-            if first == 1 or mse_test < lowest_mse:
-                lowest_mse = mse_test
-                lowest_model = net
-                first = 0
+    if first == 1 or mse_test[-1] < lowest_mse:
+        print('Model Updated')
+        lowest_mse = mse_test[-1]
 
-            # Prediction
-            pred = net.run(out, feed_dict={X: X_test})
-            line2.set_ydata(pred)
-            plt.title('Epoch ' + str(e) + ', Batch ' + str(i))
-            plt.pause(0.01)
+        # Prediction
+        pred = net.run(out, feed_dict={X: X_test})
+        line2.set_ydata(pred)
+        plt.title('Epoch ' + str(e))
+        plt.pause(0.01)
 
-pred = net.run(out, feed_dict={X: X_test})
-line2.set_ydata(pred)
-plt.title('Final')
-plt.pause(5)
+        saver.save(net, 'models/neural')
 
-dump(lowest_model, 'models/neural.joblib')
+        first = 0
+
+    e += 1
+
+print('Unexpected Failure')
+plt.pause(10)

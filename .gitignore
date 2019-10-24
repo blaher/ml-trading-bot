@@ -64,4 +64,5 @@ typings/
 venv
 data
 models/tree.joblib
-models/neural.joblib
+models/checkpoint
+models/neural.*
