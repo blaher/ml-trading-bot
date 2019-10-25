@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "flex",
+    "password": "Fl3xDBP455w0rd",
+    "database": "MLStockTrader",
+    "host": "flex-development.cen7t40nawz9.us-east-2.rds.amazonaws.com",
+    "dialect": "mysql",
+    "alpha_key": "30UYPM9M4BHQ6JWZ"
+  },
+  "test": {
+    "username": "flex",
+    "password": "Fl3xDBP455w0rd",
+    "database": "MLStockTrader",
+    "host": "flex-development.cen7t40nawz9.us-east-2.rds.amazonaws.com",
+    "dialect": "mysql",
+    "alpha_key": "30UYPM9M4BHQ6JWZ"
+  },
+  "production": {
+    "username": "flex",
+    "password": "Fl3xDBP455w0rd",
+    "database": "MLStockTrader",
+    "host": "flex-development.cen7t40nawz9.us-east-2.rds.amazonaws.com",
+    "dialect": "mysql",
+    "alpha_key": "30UYPM9M4BHQ6JWZ"
+  }
+}

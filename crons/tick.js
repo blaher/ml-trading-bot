@@ -1,6 +1,7 @@
 console.log('Setting up...');
 
-const config = require('../config.json');
+const config = require('../config/config.json');
+const models = require('../models')
 //const Alpaca = require('@alpacahq/alpaca-trade-api');
 
 var express = require('express');
