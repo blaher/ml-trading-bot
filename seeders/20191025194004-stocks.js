@@ -1034,7 +1034,7 @@ module.exports = {
       },
       {
         id: 148,
-        symbol: 'BF.B',
+        symbol: 'BFB',
         name: 'Brown-Forman Corp.',
         createdAt: new Date(),
         updatedAt: new Date()
@@ -2308,7 +2308,7 @@ module.exports = {
       },
       {
         id: 330,
-        symbol: 'BRK.B',
+        symbol: 'BRKB',
         name: 'Berkshire Hathaway',
         createdAt: new Date(),
         updatedAt: new Date()
