@@ -40,17 +40,13 @@ module.exports = {
           allowNull: false,
           type: Sequelize.DATE
         }
+      }, {
+        uniqueKeys: {
+          UNIQUE: {
+            fields: ['indexId', 'indicatorId']
+          }
+        }
       });
-
-      await queryInterface.addIndex(
-        'IndexIndicators',
-        ['indexId', 'indicatorId'],
-        {
-          indexName: 'UNIQUE',
-          indicesType: 'UNIQUE'
-        },
-        {transaction}
-      );
 
       await transaction.commit();
     } catch (err) {

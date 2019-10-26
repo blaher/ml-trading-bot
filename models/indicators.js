@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
   const Indicators = sequelize.define('Indicators', {
     symbol: {
       allowNull: false,
-      type: DataTypes.STRING(8)
+      type: DataTypes.STRING(16)
     },
     name: {
       allowNull: false,

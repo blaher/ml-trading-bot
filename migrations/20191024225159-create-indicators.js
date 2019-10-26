@@ -14,7 +14,7 @@ module.exports = {
         },
         symbol: {
           allowNull: false,
-          type: Sequelize.STRING(8)
+          type: Sequelize.STRING(16)
         },
         name: {
           allowNull: false,
@@ -28,17 +28,13 @@ module.exports = {
           allowNull: false,
           type: Sequelize.DATE
         }
+      }, {
+        uniqueKeys: {
+          UNIQUE: {
+            fields: ['symbol']
+          }
+        }
       });
-
-      await queryInterface.addIndex(
-        'Indicators',
-        ['symbol'],
-        {
-          indexName: 'UNIQUE',
-          indicesType: 'UNIQUE'
-        },
-        {transaction}
-      );
 
       await transaction.commit();
     } catch(err) {
