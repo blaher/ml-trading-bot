@@ -5,6 +5,7 @@
     "database": "MLStockTrader",
     "host": "flex-development.cen7t40nawz9.us-east-2.rds.amazonaws.com",
     "dialect": "mysql",
+    "alpha_host": "https://www.alphavantage.co",
     "alpha_key": "30UYPM9M4BHQ6JWZ"
   },
   "test": {
@@ -13,6 +14,7 @@
     "database": "MLStockTrader",
     "host": "flex-development.cen7t40nawz9.us-east-2.rds.amazonaws.com",
     "dialect": "mysql",
+    "alpha_host": "https://www.alphavantage.co",
     "alpha_key": "30UYPM9M4BHQ6JWZ"
   },
   "production": {
@@ -21,6 +23,7 @@
     "database": "MLStockTrader",
     "host": "flex-development.cen7t40nawz9.us-east-2.rds.amazonaws.com",
     "dialect": "mysql",
+    "alpha_host": "https://www.alphavantage.co",
     "alpha_key": "30UYPM9M4BHQ6JWZ"
   }
 }
