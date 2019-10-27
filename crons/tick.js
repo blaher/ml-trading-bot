@@ -10,8 +10,6 @@ const moment = require('moment');
 const unirest = require("unirest");
 
 function get_minute() {
-  //return "2019-10-25 15:59:00";
-  //return "2019-10-25 16:00:00";
   return moment().format('YYYY-MM-DD, hh:mm:00');
 }
 
@@ -27,8 +25,23 @@ function get_converted_data(data) {
     high: data['2. high']*10000,
     low: data['3. low']*10000,
     close: data['4. close']*10000,
-    volume: data['5. volume'],
+    volume: data['5. volume']
   };
+}
+
+function get_indicator_data(data, symbol) {
+  var object = {};
+
+  var i = 1;
+  for (var data_property in data) {
+    if (Object.prototype.hasOwnProperty.call(data, data_property)) {
+      object['value'+i] = data[data_property]*10000;
+
+      i++;
+    }
+  }
+
+  return object;
 }
 
 function get_previous_data(converted_data) {
@@ -81,12 +94,68 @@ function record_stock(table, object, minute, update_previous=false) {
   });
 }
 
+function record_indicator(table, object, indicator, minute) {
+  const id = object.id;
+  const symbol = object.symbol;
+  const indicator_id = indicator.id;
+  const indicator_symbol = indicator.symbol;
+  console.log('Recording for '+symbol+'\'s '+indicator_symbol+' at '+minute);
+  const formatted_minute = minute.slice(0, -3);
+
+  const rest = unirest("GET", config.alpha_host+"/query");
+
+  rest.query({
+    "function": indicator_symbol,
+    "symbol": symbol,
+    "interval": "1min",
+    "time_period": 60,
+    "series_type": "close",
+    "datatype": "json",
+    "apikey": config.alpha_key
+  });
+
+  rest.end(function (rest_res) {
+    var label = 'Technical Analysis: '+indicator_symbol;
+
+    //TODO: Add Indicator Label to Database and remove this
+    if (indicator_symbol === 'AD') {
+      label = 'Technical Analysis: Chaikin A/D';
+    }
+
+    if (rest_res.body && rest_res.body[label] && rest_res.body[label][formatted_minute]) {
+      const data = rest_res.body[label][formatted_minute];
+      var converted_data = get_indicator_data(data, indicator_symbol);
+
+      if (table === 'IndexIndicatorValues') {
+        converted_data.indexId = id;
+      } else {
+        converted_data.stockId = id;
+      }
+      converted_data.indicatorId = indicator_id;
+      converted_data.minute = minute;
+
+      models[table].create(converted_data).catch(function(err) {
+        console.log('Entry already exists');
+      });
+    } else {
+      console.log(symbol+':'+indicator_symbol+' not found');
+    }
+  });
+}
+
 router.get('/', function(req, res) {
   const minute = get_minute();
 
-  models.Indexes.findAll().then(function(indexes) {
+  models.Indexes.findAll({
+    include: [models.Indicators],
+    order: [['id', 'ASC']]
+  }).then(function(indexes) {
     indexes.forEach(function(index) {
       record_stock('IndexPrices', index, minute, true);
+
+      index.Indicators.forEach(function(indicator) {
+        record_indicator('IndexIndicatorValues', index, indicator, minute);
+      });
     });
   });
 
