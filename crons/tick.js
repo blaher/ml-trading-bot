@@ -10,13 +10,13 @@ const moment = require('moment');
 const unirest = require("unirest");
 
 function get_minute() {
-  return moment().format('YYYY-MM-DD, hh:mm:00');
+  return moment().format('YYYY-MM-DD HH:mm:00');
 }
 
 function get_previous_minute(minute) {
-  return moment(minute, 'YY-MM-DD hh:mm:ss')
+  return moment(minute, 'YYYY-MM-DD HH:mm:ss')
     .subtract(1, 'minutes')
-    .format('YYYY-MM-DD, hh:mm:00');
+    .format('YYYY-MM-DD HH:mm:00');
 }
 
 function get_converted_data(data) {
@@ -143,9 +143,7 @@ function record_indicator(table, object, indicator, minute) {
   });
 }
 
-router.get('/', function(req, res) {
-  const minute = get_minute();
-
+function loop_through(minute, models) {
   models.Indexes.findAll({
     include: [models.Indicators],
     order: [['id', 'ASC']]
@@ -164,6 +162,34 @@ router.get('/', function(req, res) {
       record_stock('StockPrices', stock, minute);
     });
   });
+}
+
+router.get('/', function(req, res) {
+  var minute = get_minute();
+
+  loop_through(minute, models);
+});
+
+router.get('/backtrace', function(req, res) {
+  var minute = req.query.start;
+  var timeout = 0;
+
+  console.log('Starting...');
+
+  var minute_future = moment(minute, 'YYYY-MM-DD HH:mm:ss').add(2, 'hours');
+  console.log('At: '+minute_future.format('YYYY-MM-DD HH:mm:00'))
+
+  while (moment(minute, 'YYYY-MM-DD HH:mm:ss').isBefore(minute_future)) {
+    setTimeout(loop_through.bind(null, minute, models), timeout);
+
+    timeout += 60000;
+
+    minute = moment(minute, 'YYYY-MM-DD HH:mm:ss')
+      .add(1, 'minutes')
+      .format('YYYY-MM-DD HH:mm:00');
+  }
+
+  console.log('Finished')
 });
 
 module.exports = router;
