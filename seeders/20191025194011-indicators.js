@@ -56,6 +56,7 @@ module.exports = {
         id: 8,
         symbol: 'MAMA',
         name: 'MESA Adaptive Moving Average',
+        values: 2,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -77,6 +78,7 @@ module.exports = {
         id: 11,
         symbol: 'MACD',
         name: 'Moving Average Convergence / Divergence',
+        values: 3,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -84,6 +86,7 @@ module.exports = {
         id: 12,
         symbol: 'MACDEXT',
         name: 'Moving Average Convergence / Divergence Values With Controllable Moving Average Type',
+        values: 3,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -91,6 +94,7 @@ module.exports = {
         id: 13,
         symbol: 'STOCH',
         name: 'Stochastic Oscillator',
+        values: 2,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -98,6 +102,7 @@ module.exports = {
         id: 14,
         symbol: 'STOCHF',
         name: 'Stochastic Fast',
+        values: 2,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -112,6 +117,7 @@ module.exports = {
         id: 16,
         symbol: 'STOCHRSI',
         name: 'Stochastic Relative Strength Index',
+        values: 2,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -196,6 +202,7 @@ module.exports = {
         id: 28,
         symbol: 'AROON',
         name: 'Aroon',
+        values: 2,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -266,6 +273,7 @@ module.exports = {
         id: 38,
         symbol: 'BBANDS',
         name: 'Bollinger Bands',
+        values: 3,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -280,6 +288,7 @@ module.exports = {
         id: 40,
         symbol: 'MIDPRICE',
         name: 'Midpoint Price',
+        values: 2,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -343,6 +352,7 @@ module.exports = {
         id: 49,
         symbol: 'HT_SINE',
         name: 'Hilbert Transform, Sine Wave',
+        values: 2,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -371,6 +381,7 @@ module.exports = {
         id: 53,
         symbol: 'HT_PHASOR',
         name: 'Hilbert Transform, Phasor Components',
+        values: 2,
         createdAt: new Date(),
         updatedAt: new Date()
       }

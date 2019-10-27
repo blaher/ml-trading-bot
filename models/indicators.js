@@ -5,10 +5,19 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.STRING(16)
     },
+    symbol: {
+      allowNull: false,
+      type: DataTypes.STRING(16)
+    },
     name: {
       allowNull: false,
       type: DataTypes.STRING(255)
     },
+    values: {
+      allowNull: false,
+      type: DataTypes.ENUM(1, 2, 3),
+      defaultValue: 1
+    }
   }, {
     indexes: [
       {
