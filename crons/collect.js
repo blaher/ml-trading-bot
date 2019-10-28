@@ -13,6 +13,10 @@ function get_minute() {
   return moment().format('YYYY-MM-DD HH:mm:00');
 }
 
+function get_minute_moment(minute) {
+  return moment(minute, 'YYYY-MM-DD HH:mm:ss');
+}
+
 function get_current_minute() {
   return moment();
 }
@@ -22,19 +26,40 @@ function get_min_minute() {
 }
 
 function get_max_minute() {
-  return moment('016:00:00', 'HH:mm:ss');
+  return moment('16:00:00', 'HH:mm:ss');
 }
 
 function get_previous_minute(minute) {
-  return moment(minute, 'YYYY-MM-DD HH:mm:ss')
-    .subtract(1, 'minutes')
-    .format('YYYY-MM-DD HH:mm:00');
+  const minute_moment = get_minute_moment(minute);
+
+  if (minute_moment.isSame(get_min_minute())) {
+    return minute_moment
+      .subtract(1, 'days')
+      .hour(16)
+      .minute(0)
+      .format('YYYY-MM-DD HH:mm:00');
+  } else {
+    return minute_moment
+      .subtract(1, 'minutes')
+      .format('YYYY-MM-DD HH:mm:00');
+  }
 }
 
 function get_minute_to_update(minute) {
-  return moment(minute, 'YYYY-MM-DD HH:mm:ss')
-    .subtract(2, 'minutes')
-    .format('YYYY-MM-DD HH:mm:00');
+  const minute_moment = get_minute_moment(minute);
+
+  if (minute_moment.isSame(get_min_minute())) {
+    return minute_moment
+      .subtract(1, 'days')
+      .hour(16)
+      .minute(0)
+      .subtract(1, 'minutes')
+      .format('YYYY-MM-DD HH:mm:00');
+  } else {
+    return minute_moment
+      .subtract(2, 'minutes')
+      .format('YYYY-MM-DD HH:mm:00');
+  }
 }
 
 function get_converted_data(data) {
@@ -67,9 +92,9 @@ function get_previous_data(converted_data) {
 }
 
 function record_stock(table, object, minute, update_previous=false) {
-  const previous_minute = get_previous_minute(minute);
-  //TODO: Backfill and update prior day if at begining of day
-  const minute_to_update = get_minute_to_update(minute);
+  var previous_minute = get_previous_minute(minute);
+  var minute_to_update = get_minute_to_update(minute);
+
   const id = object.id;
   const symbol = object.symbol;
   console.log('Recording for '+symbol+' at '+minute);
@@ -309,19 +334,19 @@ router.get('/backtrace', function(req, res) {
 
   console.log('Starting Collect Backtrace...');
 
-  var minute_future = moment(minute, 'YYYY-MM-DD HH:mm:ss').add(2, 'hours');
+  var minute_future = get_minute_moment(minute).add(2, 'hours');
   console.log('At: '+minute.format('YYYY-MM-DD HH:mm:00'))
 
   if (req.query.end) {
     minute_future = req.query.end;
   }
 
-  while (moment(minute, 'YYYY-MM-DD HH:mm:ss').isBefore(minute_future)) {
+  while (get_minute_moment(minute).isBefore(minute_future)) {
     setTimeout(loop_through.bind(null, minute, models), timeout);
 
     timeout += 60000;
 
-    minute = moment(minute, 'YYYY-MM-DD HH:mm:ss')
+    minute = get_minute_moment(minute)
       .add(1, 'minutes')
       .format('YYYY-MM-DD HH:mm:00');
   }
