@@ -267,7 +267,9 @@ router.get('/backtrace', function(req, res) {
       .format('YYYY-MM-DD HH:mm:00');
   }
 
-  console.log('Finished')
+  console.log('Finished');
+
+  res.sendStatus(200);
 });
 
 module.exports = router;

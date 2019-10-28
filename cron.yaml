@@ -1,5 +1,5 @@
 version: 1
 cron:
- - name: "tick-AAPL"
-   url: "/crons/tick?stock=AAPL"
+ - name: "tick"
+   url: "/crons/tick"
    schedule: "* 13-20 * * 1-5"
