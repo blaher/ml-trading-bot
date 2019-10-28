@@ -80,21 +80,61 @@ function record_stock(table, object, minute, update_previous=false) {
       converted_data.minute = minute;
 
       models[table].create(converted_data).catch(function() {
-        console.log('Entry already exists');
+        console.log('Entry for '+symbol+' already exists');
       });
 
       if (update_previous) {
-        models[table].update(previous_data, {
-          where: {indexId: 1, minute: previous_minute}
-        });
+        var where = {minute: previous_minute};
+        if (table === 'IndexPrices') {
+          where.indexId = id;
+        } else {
+          where.stockId = id;
+        }
+
+        models[table].update(previous_data, {where: where});
       }
     } else {
       console.log(symbol+' not found');
+      console.log('Back filling...')
+
+      var where = {minute: previous_minute};
+      if (table === 'IndexPrices') {
+        where.indexId = id;
+      } else {
+        where.stockId = id;
+      }
+
+      models[table].findOne({where: where}).then(function(previous_price) {
+        if (!previous_price) {
+          console.log('Previous price for '+symbol+' not found');
+          return;
+        }
+
+        var price = {
+          minute: minute,
+          open: previous_price.open,
+          high: previous_price.high,
+          low: previous_price.low,
+          close: previous_price.close,
+          volume: previous_price.volume
+        };
+
+        if (table === 'IndexPrices') {
+          price.indexId = id;
+        } else {
+          price.stockId = id;
+        }
+
+        models[table].create(price).catch(function() {
+          console.log('Backfilled entry for '+symbol+' already exists');
+        });
+      });
     }
   });
 }
 
 function record_indicator(table, object, indicator, minute) {
+  const previous_minute = get_previous_minute(minute);
   const id = object.id;
   const symbol = object.symbol;
   const indicator_id = indicator.id;
@@ -134,11 +174,45 @@ function record_indicator(table, object, indicator, minute) {
       converted_data.indicatorId = indicator_id;
       converted_data.minute = minute;
 
-      models[table].create(converted_data).catch(function(err) {
-        console.log('Entry already exists');
+      models[table].create(converted_data).catch(function() {
+        console.log('Entry for '+symbol+':'+indicator_symbol+' already exists');
       });
     } else {
       console.log(symbol+':'+indicator_symbol+' not found');
+      console.log('Back filling...')
+
+      var where = {indicatorId: indicator_id, minute: previous_minute};
+      if (table === 'IndexIndicatorValues') {
+        where.indexId = id;
+      } else {
+        where.stockId = id;
+      }
+
+      console.log(where);
+      models[table].findOne({where: where}).then(function(previous_values) {
+        if (!previous_values) {
+          console.log('Previous values for '+symbol+':'+indicator_symbol+' not found');
+          return;
+        }
+
+        var values = {
+          indicatorId: indicator_id,
+          minute: minute,
+          value1: previous_values.value1,
+          value2: previous_values.value2,
+          value3: previous_values.value3
+        };
+
+        if (table === 'IndexIndicatorValues') {
+          values.indexId = id;
+        } else {
+          values.stockId = id;
+        }
+
+        models[table].create(values).catch(function() {
+          console.log('Backfilled entry for '+symbol+':'+indicator_symbol+' already exists');
+        })
+      });
     }
   });
 }
@@ -157,15 +231,16 @@ function loop_through(minute, models) {
     });
   });
 
-  models.Stocks.findAll({order: [['id', 'ASC']]}).then(function(stocks) {
+  /*models.Stocks.findAll({order: [['id', 'ASC']]}).then(function(stocks) {
     stocks.forEach(function(stock) {
       record_stock('StockPrices', stock, minute);
     });
-  });
+  });*/
 }
 
 router.get('/', function(req, res) {
   var minute = get_minute();
+  minute = '2019-10-25 16:01:00';
 
   loop_through(minute, models);
 });
