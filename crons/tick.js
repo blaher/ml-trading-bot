@@ -246,6 +246,20 @@ router.get('/', function(req, res) {
   loop_through(minute, models);
 
   console.log('Finished Tick');
+
+  res.sendStatus(200);
+});
+
+router.post('/', function(req, res) {
+  var minute = get_minute();
+
+  console.log('Starting Tick...');
+
+  loop_through(minute, models);
+
+  console.log('Finished Tick');
+
+  res.sendStatus(200);
 });
 
 router.get('/backtrace', function(req, res) {
