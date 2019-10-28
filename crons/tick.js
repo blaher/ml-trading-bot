@@ -241,14 +241,20 @@ function loop_through(minute, models) {
 router.get('/', function(req, res) {
   var minute = get_minute();
 
+  console.log('Starting Tick...');
+
   loop_through(minute, models);
+
+  console.log('Finished Tick');
 });
 
 router.get('/backtrace', function(req, res) {
   var minute = req.query.start;
   var timeout = 0;
 
-  console.log('Starting...');
+
+
+  console.log('Starting Tick Backtrace...');
 
   var minute_future = moment(minute, 'YYYY-MM-DD HH:mm:ss').add(2, 'hours');
   console.log('At: '+minute.format('YYYY-MM-DD HH:mm:00'))
@@ -267,7 +273,7 @@ router.get('/backtrace', function(req, res) {
       .format('YYYY-MM-DD HH:mm:00');
   }
 
-  console.log('Finished');
+  console.log('Finished Tick Backtrace');
 
   res.sendStatus(200);
 });
