@@ -11,10 +11,10 @@ from warnings import simplefilter
 simplefilter(action='ignore', category=FutureWarning)
 
 # Import data
-data = pd.read_csv('data/data_stocks.csv')
+data = pd.read_csv('data/SPY.csv')
 
-# Drop date variable
-data = data.drop(['DATE'], 1)
+# Drop minute variable
+data = data.drop(['minute'], 1)
 
 # Dimensions of dataset
 n = data.shape[0]

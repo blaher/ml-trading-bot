@@ -2,7 +2,7 @@
   "development": {
     "username": "flex",
     "password": "Fl3xDBP455w0rd",
-    "database": "MLStockTrader",
+    "database": "StockTrader",
     "host": "flex-development.cen7t40nawz9.us-east-2.rds.amazonaws.com",
     "dialect": "mysql",
     "alpha_host": "https://www.alphavantage.co",
@@ -11,7 +11,7 @@
   "test": {
     "username": "flex",
     "password": "Fl3xDBP455w0rd",
-    "database": "MLStockTrader",
+    "database": "StockTrader",
     "host": "flex-development.cen7t40nawz9.us-east-2.rds.amazonaws.com",
     "dialect": "mysql",
     "alpha_host": "https://www.alphavantage.co",
@@ -20,7 +20,7 @@
   "production": {
     "username": "flex",
     "password": "Fl3xDBP455w0rd",
-    "database": "MLStockTrader",
+    "database": "StockTrader",
     "host": "flex-development.cen7t40nawz9.us-east-2.rds.amazonaws.com",
     "dialect": "mysql",
     "alpha_host": "https://www.alphavantage.co",

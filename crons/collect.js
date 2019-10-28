@@ -56,6 +56,7 @@ function get_previous_data(converted_data) {
 
 function record_stock(table, object, minute, update_previous=false) {
   const previous_minute = get_previous_minute(minute);
+  //TODO: Backfill and update prior day if at begining of day
   const minute_to_update = get_minute_to_update(minute);
   const id = object.id;
   const symbol = object.symbol;
