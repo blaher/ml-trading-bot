@@ -1,5 +1,5 @@
 version: 1
 cron:
- - name: "tick"
-   url: "/crons/tick"
+ - name: "collect"
+   url: "/crons/collect"
    schedule: "* 13-20 * * 1-5"

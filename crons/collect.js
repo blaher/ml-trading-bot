@@ -15,7 +15,7 @@ function get_minute() {
 
 function get_previous_minute(minute) {
   return moment(minute, 'YYYY-MM-DD HH:mm:ss')
-    .subtract(1, 'minutes')
+    .subtract(2, 'minutes')
     .format('YYYY-MM-DD HH:mm:00');
 }
 
@@ -218,34 +218,36 @@ function record_indicator(table, object, indicator, minute) {
 }
 
 function loop_through(minute, models) {
-  models.Indexes.findAll({
-    include: [models.Indicators],
-    order: [['id', 'ASC']]
-  }).then(function(indexes) {
-    indexes.forEach(function(index) {
-      record_stock('IndexPrices', index, minute, true);
+  setTimeout(function() {
+    models.Indexes.findAll({
+      include: [models.Indicators],
+      order: [['id', 'ASC']]
+    }).then(function(indexes) {
+      indexes.forEach(function(index) {
+        record_stock('IndexPrices', index, minute, true);
 
-      index.Indicators.forEach(function(indicator) {
-        record_indicator('IndexIndicatorValues', index, indicator, minute);
+        index.Indicators.forEach(function(indicator) {
+          record_indicator('IndexIndicatorValues', index, indicator, minute);
+        });
       });
     });
-  });
 
-  models.Stocks.findAll({order: [['id', 'ASC']]}).then(function(stocks) {
-    stocks.forEach(function(stock) {
-      record_stock('StockPrices', stock, minute);
+    models.Stocks.findAll({order: [['id', 'ASC']]}).then(function(stocks) {
+      stocks.forEach(function(stock) {
+        record_stock('StockPrices', stock, minute);
+      });
     });
-  });
+  }, 60000);
 }
 
 router.get('/', function(req, res) {
   var minute = get_minute();
 
-  console.log('Starting Tick...');
+  console.log('Starting Collect...');
 
   loop_through(minute, models);
 
-  console.log('Finished Tick');
+  console.log('Finished Collect');
 
   res.sendStatus(200);
 });
@@ -253,11 +255,11 @@ router.get('/', function(req, res) {
 router.post('/', function(req, res) {
   var minute = get_minute();
 
-  console.log('Starting Tick...');
+  console.log('Starting Collect...');
 
   loop_through(minute, models);
 
-  console.log('Finished Tick');
+  console.log('Finished Collect');
 
   res.sendStatus(200);
 });
@@ -266,9 +268,7 @@ router.get('/backtrace', function(req, res) {
   var minute = req.query.start;
   var timeout = 0;
 
-
-
-  console.log('Starting Tick Backtrace...');
+  console.log('Starting Collect Backtrace...');
 
   var minute_future = moment(minute, 'YYYY-MM-DD HH:mm:ss').add(2, 'hours');
   console.log('At: '+minute.format('YYYY-MM-DD HH:mm:00'))
@@ -287,7 +287,7 @@ router.get('/backtrace', function(req, res) {
       .format('YYYY-MM-DD HH:mm:00');
   }
 
-  console.log('Finished Tick Backtrace');
+  console.log('Finished Collect Backtrace');
 
   res.sendStatus(200);
 });
