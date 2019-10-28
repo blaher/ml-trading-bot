@@ -76,8 +76,7 @@ router.get('/', function(req, res) {
             if (column === 'minute') {
               content += moment(row[column]).format('YYYY-MM-DD HH:mm:00');
             } else {
-              //TODO: Put factor in to config
-              content += row[column]/10000;
+              content += row[column]/config.factor;
             }
           });
         });

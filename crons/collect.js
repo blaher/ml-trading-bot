@@ -64,10 +64,10 @@ function get_minute_to_update(minute) {
 
 function get_converted_data(data) {
   return {
-    open: data['1. open']*10000,
-    high: data['2. high']*10000,
-    low: data['3. low']*10000,
-    close: data['4. close']*10000,
+    open: data['1. open']*config.factor,
+    high: data['2. high']*config.factor,
+    low: data['3. low']*config.factor,
+    close: data['4. close']*config.factor,
     volume: data['5. volume']
   };
 }
