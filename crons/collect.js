@@ -15,6 +15,12 @@ function get_minute() {
 
 function get_previous_minute(minute) {
   return moment(minute, 'YYYY-MM-DD HH:mm:ss')
+    .subtract(1, 'minutes')
+    .format('YYYY-MM-DD HH:mm:00');
+}
+
+function get_minute_to_update(minute) {
+  return moment(minute, 'YYYY-MM-DD HH:mm:ss')
     .subtract(2, 'minutes')
     .format('YYYY-MM-DD HH:mm:00');
 }
@@ -50,6 +56,7 @@ function get_previous_data(converted_data) {
 
 function record_stock(table, object, minute, update_previous=false) {
   const previous_minute = get_previous_minute(minute);
+  const minute_to_update = get_minute_to_update(minute);
   const id = object.id;
   const symbol = object.symbol;
   console.log('Recording for '+symbol+' at '+minute);
@@ -84,7 +91,7 @@ function record_stock(table, object, minute, update_previous=false) {
       });
 
       if (update_previous) {
-        var where = {minute: previous_minute};
+        var where = {minute: minute_to_update};
         if (table === 'IndexPrices') {
           where.indexId = id;
         } else {
@@ -128,6 +135,19 @@ function record_stock(table, object, minute, update_previous=false) {
         models[table].create(price).catch(function() {
           console.log('Backfilled entry for '+symbol+' already exists');
         });
+
+        if (update_previous) {
+          const previous_data = get_previous_data(price);
+
+          var where = {minute: minute_to_update};
+          if (table === 'IndexPrices') {
+            where.indexId = id;
+          } else {
+            where.stockId = id;
+          }
+
+          models[table].update(previous_data, {where: where});
+        }
       });
     }
   });
@@ -241,6 +261,8 @@ function loop_through(minute, models) {
 }
 
 router.get('/', function(req, res) {
+  //TODO: Check before 9:30am
+  //TODO: Check market is open with Alpaca
   var minute = get_minute();
 
   console.log('Starting Collect...');
@@ -253,6 +275,8 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
+  //TODO: Check before 9:30am
+  //TODO: Check market is open with Alpaca
   var minute = get_minute();
 
   console.log('Starting Collect...');
