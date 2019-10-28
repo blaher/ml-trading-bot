@@ -24,20 +24,22 @@ router.get('/', function(req, res) {
       var columns = ['minute', 'futurePrice'];
 
       index.Stocks.forEach(function(stock) {
-        //select += ', (SELECT sp.open FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_open';
-        //select += ', (SELECT sp.high FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_high';
-        //select += ', (SELECT sp.low FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_low';
-        select += ', (SELECT sp.close FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_close';
-        //select += ', (SELECT sp.volume FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_volume';
+        if (stock.symbol !== 'GL') {
+          //select += ', (SELECT sp.open FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_open';
+          //select += ', (SELECT sp.high FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_high';
+          //select += ', (SELECT sp.low FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_low';
+          select += ', (SELECT sp.close FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_close';
+          //select += ', (SELECT sp.volume FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_volume';
 
-        //header += ', stock_'+stock.symbol+'_open, stock_'+stock.symbol+'_high, stock_'+stock.symbol+'_low, stock_'+stock.symbol+'_close, stock_'+stock.symbol+'_volume';
-        header += ', stock_'+stock.symbol+'_close'
+          //header += ', stock_'+stock.symbol+'_open, stock_'+stock.symbol+'_high, stock_'+stock.symbol+'_low, stock_'+stock.symbol+'_close, stock_'+stock.symbol+'_volume';
+          header += ', stock_'+stock.symbol+'_close'
 
-        //columns.push('stock_'+stock.symbol+'_open');
-        //columns.push('stock_'+stock.symbol+'_high');
-        //columns.push('stock_'+stock.symbol+'_low');
-        columns.push('stock_'+stock.symbol+'_close');
-        //columns.push('stock_'+stock.symbol+'_volume');
+          //columns.push('stock_'+stock.symbol+'_open');
+          //columns.push('stock_'+stock.symbol+'_high');
+          //columns.push('stock_'+stock.symbol+'_low');
+          columns.push('stock_'+stock.symbol+'_close');
+          //columns.push('stock_'+stock.symbol+'_volume');
+        }
       });
       /*index.Indicators.forEach(function(indicator) {
         var i = 1;
