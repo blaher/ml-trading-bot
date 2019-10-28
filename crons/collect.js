@@ -13,6 +13,18 @@ function get_minute() {
   return moment().format('YYYY-MM-DD HH:mm:00');
 }
 
+function get_current_minute() {
+  return moment();
+}
+
+function get_min_minute() {
+  return moment('09:30:00', 'HH:mm:ss');
+}
+
+function get_max_minute() {
+  return moment('016:00:00', 'HH:mm:ss');
+}
+
 function get_previous_minute(minute) {
   return moment(minute, 'YYYY-MM-DD HH:mm:ss')
     .subtract(1, 'minutes')
@@ -261,30 +273,32 @@ function loop_through(minute, models) {
   }, 60000);
 }
 
-router.get('/', function(req, res) {
-  //TODO: Check before 9:30am
+function load_init(models) {
   //TODO: Check market is open with Alpaca
   var minute = get_minute();
+  const current_minute = get_current_minute();
+  const min_minute = get_min_minute();
+  const max_minute = get_max_minute();
 
-  console.log('Starting Collect...');
+  if (current_minute.isSameOrBefore(max_minute) && current_minute.isSameOrAfter(min_minute)) {
+    console.log('Starting Collect...');
 
-  loop_through(minute, models);
+    loop_through(minute, models);
 
-  console.log('Finished Collect');
+    console.log('Finished Collect');
+  } else {
+    console.log('Markets not open')
+  }
+}
+
+router.get('/', function(req, res) {
+  load_init(models);
 
   res.sendStatus(200);
 });
 
 router.post('/', function(req, res) {
-  //TODO: Check before 9:30am
-  //TODO: Check market is open with Alpaca
-  var minute = get_minute();
-
-  console.log('Starting Collect...');
-
-  loop_through(minute, models);
-
-  console.log('Finished Collect');
+  load_init(models);
 
   res.sendStatus(200);
 });
