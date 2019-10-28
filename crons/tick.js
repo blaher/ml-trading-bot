@@ -231,16 +231,15 @@ function loop_through(minute, models) {
     });
   });
 
-  /*models.Stocks.findAll({order: [['id', 'ASC']]}).then(function(stocks) {
+  models.Stocks.findAll({order: [['id', 'ASC']]}).then(function(stocks) {
     stocks.forEach(function(stock) {
       record_stock('StockPrices', stock, minute);
     });
-  });*/
+  });
 }
 
 router.get('/', function(req, res) {
   var minute = get_minute();
-  minute = '2019-10-25 16:01:00';
 
   loop_through(minute, models);
 });
@@ -252,7 +251,11 @@ router.get('/backtrace', function(req, res) {
   console.log('Starting...');
 
   var minute_future = moment(minute, 'YYYY-MM-DD HH:mm:ss').add(2, 'hours');
-  console.log('At: '+minute_future.format('YYYY-MM-DD HH:mm:00'))
+  console.log('At: '+minute.format('YYYY-MM-DD HH:mm:00'))
+
+  if (req.query.end) {
+    minute_future = req.query.end;
+  }
 
   while (moment(minute, 'YYYY-MM-DD HH:mm:ss').isBefore(minute_future)) {
     setTimeout(loop_through.bind(null, minute, models), timeout);
