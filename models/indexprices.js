@@ -33,7 +33,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     futurePrice: {
       type: DataTypes.INTEGER.UNSIGNED
-    }
+    },
+    trade: DataTypes.ENUM('sell', 'buy')
   }, {
     indexes: [
       {

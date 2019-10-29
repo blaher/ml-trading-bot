@@ -16,9 +16,9 @@ router.get('/', function(req, res) {
     indexes.forEach(function(index) {
       console.log('Data: '+index.symbol);
 
-      var select = 'ip.minute, ip.futurePrice, ip.open, ip.high, ip.low, ip.close';
-      var header = 'minute, futurePrice, open, high, low, close';
-      var columns = ['minute', 'futurePrice', 'open', 'high', 'low', 'close'];
+      var select = 'ip.minute, ip.trade, ip.open, ip.high, ip.low, ip.close';
+      var header = 'minute, trade, open, high, low, close';
+      var columns = ['minute', 'trade', 'open', 'high', 'low', 'close'];
 
       index.Indicators.forEach(function(indicator) {
         var i = 1;
@@ -33,7 +33,7 @@ router.get('/', function(req, res) {
         }
       });
 
-      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? AND ip.futurePrice IS NOT NULL ORDER BY ip.minute;';
+      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? AND ip.trade IS NOT NULL ORDER BY ip.minute;';
 
       models.sequelize.query(sql, {
         replacements: [index.id],
@@ -54,6 +54,8 @@ router.get('/', function(req, res) {
 
             if (column === 'minute') {
               content += moment(row[column]).format('YYYY-MM-DD HH:mm:00');
+            } else if (column === 'trade') {
+              content += row[column];
             } else {
               content += row[column]/config.factor;
             }
