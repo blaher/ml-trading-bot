@@ -2,12 +2,15 @@ var env = process.env.NODE_ENV || 'development';
 var config = require('../config/config.json')[env];
 const models = require('../models')
 
-function load_init(models) {
-  const sql = 'UPDATE IndexPrices SET trade = \'sell\' WHERE futurePrice IS NOT NULL AND trade IS NULL AND close > futurePrice;';
-  models.sequelize.query(sql, {});
+const express = require('express');
+const router = express.Router();
 
-  const sql = 'UPDATE IndexPrices SET trade = \'buy\' WHERE futurePrice IS NOT NULL AND trade IS NULL AND close <= futurePrice;';
-  models.sequelize.query(sql, {});
+function load_init(models) {
+  const sql_sell = 'UPDATE IndexPrices SET trade = \'sell\' WHERE futurePrice IS NOT NULL AND trade IS NULL AND close > futurePrice;';
+  models.sequelize.query(sql_sell, {});
+
+  const sql_buy = 'UPDATE IndexPrices SET trade = \'buy\' WHERE futurePrice IS NOT NULL AND trade IS NULL AND close <= futurePrice;';
+  models.sequelize.query(sql_buy, {});
 }
 
 router.get('/', function(req, res) {
@@ -21,3 +24,5 @@ router.post('/', function(req, res) {
 
   res.sendStatus(200);
 });
+
+module.exports = router;
