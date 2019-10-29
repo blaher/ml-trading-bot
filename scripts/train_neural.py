@@ -11,7 +11,7 @@ from warnings import simplefilter
 simplefilter(action='ignore', category=FutureWarning)
 
 # Import data
-data = pd.read_csv('data/SPY.csv')
+data = pd.read_csv('data/SPY_neural.csv')
 
 # Drop minute variable
 data = data.drop(['minute'], 1)
