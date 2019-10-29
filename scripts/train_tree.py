@@ -38,6 +38,7 @@ def insert_neural(data, net, out):
         prediction = net.run(out, feed_dict={X: row})
         neural_predictions.append(prediction)
 
+    #TODO: Add Prediciton Delta against close
     data['neural_prediction'] = neural_predictions
 
     return data
@@ -69,6 +70,7 @@ data = pandas.read_csv(file_path, skipinitialspace=True)
 stock_data = data.drop(features, axis=1)
 stock_data = stock_data.drop(['minute', 'trade'], axis=1)
 
+#modulularize this so it's not repetitive in trainings
 n_stocks = stock_data.shape[1]
 
 # Neurons
