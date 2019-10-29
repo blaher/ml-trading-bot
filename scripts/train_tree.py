@@ -7,77 +7,72 @@ from joblib import dump
 from warnings import simplefilter
 simplefilter(action='ignore', category=FutureWarning)
 
-runs = 100
-features = ['Rooms', 'Bathroom', 'Landsize', 'Lattitude', 'Longtitude']
+#TODO: Autoload these
+features = [
+    'open', 'high', 'low', 'close', 'indicator_MAMA_value1',
+    'indicator_MAMA_value2', 'indicator_MACD_value1', 'indicator_MACD_value2',
+    'indicator_MACD_value3', 'indicator_MACDEXT_value1',
+    'indicator_MACDEXT_value2', 'indicator_MACDEXT_value3',
+    'indicator_STOCH_value1', 'indicator_STOCH_value2',
+    'indicator_STOCHF_value1', 'indicator_STOCHF_value2',
+    'indicator_STOCHRSI_value1', 'indicator_STOCHRSI_value2',
+    'indicator_AROON_value1', 'indicator_AROON_value2',
+    'indicator_BBANDS_value1', 'indicator_BBANDS_value2',
+    'indicator_BBANDS_value3', 'indicator_MIDPRICE_value1',
+    'indicator_MIDPRICE_value2', 'indicator_HT_SINE_value1',
+    'indicator_HT_SINE_value2', 'indicator_HT_PHASOR_value1',
+    'indicator_HT_PHASOR_value2'
+]
 
-def get_mae(leaf_nodes, train_x, test_x, train_y, test_y):
+def get_errors(leaf_nodes, train_x, test_x, train_y, test_y):
     model = RandomForestRegressor(max_leaf_nodes=leaf_nodes)
     model.fit(train_x, train_y)
 
     preds_val = model.predict(test_x)
-    mae = mean_absolute_error(test_y, preds_val)
+    length = len(preds_val)
+    for i in range(length):
+        if preds_val[i] >= 0.5:
+            preds_val[i] = 1
+        else:
+            preds_val[i] = 0
+    preds_val = [int(round(x)) for x in list(preds_val)]
 
-    print("Leaf nodes: %d  \t\t\t Mean Absolute Error:  %d" %(leaf_nodes, mae))
-    return(mae, model)
+    errors = 0
+    for i in range(length):
+        if (preds_val[i] != test_y[i]):
+            errors += 1
 
-def recurse_nodes(min_nodes, max_nodes, train_x, x, train_y, y):
-    increment = (max_nodes-min_nodes)/10
+    print("Leaf nodes: %d  \t Errors:  %d out of %d" %(leaf_nodes, errors, length))
+    return(errors, model)
 
-    i = 0
-    first = 1
-    previous_nodes = 0
-    while i < 10:
-        nodes = round(min_nodes+(i*increment))
-
-        if previous_nodes < nodes:
-            mae, model = get_mae(nodes, train_x, x, train_y, y)
-
-            if first == 1 or mae < lowest_mae:
-                lowest_mae = mae
-                lowest_model = model
-
-                if i == 0:
-                    range_min = min_nodes
-                else:
-                    range_min = min_nodes+((i-1)*increment)
-
-                range_max = min_nodes+((i+1)*increment)
-                if range_max > max_nodes:
-                    range_max = max_nodes
-
-                first = 0
-
-        previous_nodes = nodes
-        i += 1
-
-    if increment <= 0.1:
-        print("Lowest Mean Absolute Error:  %d" %(lowest_mae))
-        return(lowest_model, mae)
-    else:
-        return(recurse_nodes(range_min, range_max, train_x, x, train_y, y))
-
-file_path = 'data/train.csv'
-data = pandas.read_csv(file_path)
+file_path = 'data/SPY_tree.csv'
+data = pandas.read_csv(file_path, skipinitialspace=True)
 data = data.dropna(axis=0)
-y = data.Price
+y = list(data.trade)
 x = data[features]
 
 train_x, test_x, train_y, test_y = train_test_split(x, y, random_state = 0)
 
 i = 0
 first = 1
-while i < runs:
-    print("Run:  %d out of %d" %(i+1, runs))
-    model, mae = recurse_nodes(2, len(train_x), train_x, test_x, train_y, test_y)
+test_len = len(test_y)
+errors = test_len
+lowest_errors = errors
+nodes = 2
+while lowest_errors/test_len > 0.2:
+    print("Run:  %d" %(i+1))
+    errors, model = get_errors(nodes, train_x, test_x, train_y, test_y)
 
-    if first == 1 or mae < lowest_mae:
-        lowest_mae = mae
+    if first == 1 or errors < lowest_errors:
+        lowest_errors = errors
         lowest_model = model
 
-        first = 0
+        dump(lowest_model, 'models/tree.joblib')
 
+        first = 0
+    print("Lowest Errors: ", lowest_errors)
+
+    nodes += 1
     i += 1
 
-print("Absolute Lowest Mean Absolute Error:  %d" %(lowest_mae))
-
-dump(lowest_model, 'models/tree.joblib')
+print("Absolute Lowest Mean Absolute Error:  %d" %(lowest_errors))

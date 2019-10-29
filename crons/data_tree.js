@@ -16,7 +16,9 @@ router.get('/', function(req, res) {
     indexes.forEach(function(index) {
       console.log('Data: '+index.symbol);
 
-      var select = 'ip.minute, ip.trade, ip.open, ip.high, ip.low, ip.close';
+      var select = 'ip.minute';
+      select += ', ip.trade-1 as trade';
+      select += ', ip.open, ip.high, ip.low, ip.close';
       var header = 'minute, trade, open, high, low, close';
       var columns = ['minute', 'trade', 'open', 'high', 'low', 'close'];
 
