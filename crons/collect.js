@@ -30,6 +30,7 @@ function get_max_minute() {
 }
 
 function get_previous_minute(minute) {
+  //TODO: Consider Weekends and Holidays too
   const minute_moment = get_minute_moment(minute);
 
   if (minute_moment.isSame(get_min_minute())) {
@@ -46,6 +47,8 @@ function get_previous_minute(minute) {
 }
 
 function get_minute_to_update(minute) {
+  //TODO: Consider Weekends and Holidays too
+  //TODO: Fix futurePrice skip on new day
   const minute_moment = get_minute_moment(minute);
 
   if (minute_moment.isSame(get_min_minute())) {

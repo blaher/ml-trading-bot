@@ -12,7 +12,9 @@ const fs = require('fs');
 router.get('/', function(req, res) {
   console.log('Starting Tree Data...');
 
-  models.Indexes.findAll({include: [models.Indicators]}).then(function(indexes) {
+  models.Indexes.findAll({
+    include: [models.Indicators, models.Stocks]
+  }).then(function(indexes) {
     indexes.forEach(function(index) {
       console.log('Data: '+index.symbol);
 
@@ -32,6 +34,16 @@ router.get('/', function(req, res) {
           columns.push('indicator_'+indicator.symbol+'_value'+i);
 
           i++;
+        }
+      });
+
+      index.Stocks.forEach(function(stock) {
+        if (stock.symbol !== 'GL') {
+          select += ', (SELECT sp.close FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_close';
+
+          header += ', stock_'+stock.symbol+'_close'
+
+          columns.push('stock_'+stock.symbol+'_close');
         }
       });
 
