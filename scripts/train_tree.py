@@ -37,7 +37,8 @@ def insert_neural(data, net, out):
     for i in range(data_len):
         row = data_transform.loc[[i]]
         print(row)
-        prediction = net.run(out, feed_dict={X: row})
+        prediction = net.run(out, feed_dict={X: row})[0][0]
+        print(prediction)
         neural_predictions.append(prediction)
 
     #TODO: Add Prediciton Delta against close
