@@ -34,7 +34,7 @@ function get_lower_minute() {
 }
 
 function get_upper_minute() {
-  return get_min_minute().add(1, 'minutes');
+  return get_max_minute().add(1, 'minutes');
 }
 
 function get_previous_minute(minute) {
@@ -323,6 +323,7 @@ function load_init(models) {
 
     console.log('Finished Collect');
   } else {
+    console.log(current_minute.isBefore(upper_minute));
     console.log('Markets not open')
   }
 }
