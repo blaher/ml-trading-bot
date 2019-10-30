@@ -66,6 +66,7 @@ function load_init(models) {
 
               py.stdout.on('end', function() {
                 guess = parseInt(dataString);
+                console.log('Guess: '+guess);
 
                 alpaca.getAccount().then(function(account) {
                   amount = account.cash;
@@ -78,17 +79,23 @@ function load_init(models) {
                     console.log('Stock Price: '+current_stock_price);
 
                     if (guess) {
-                      console.log('Buying: '+Math.floor(amount/current_stock_price));
+                      var qty = Math.floor(amount/current_stock_price);
 
-                      alpaca.createOrder({
-                        symbol: index.symbol,
-                        qty: Math.floor(amount/current_stock_price),
-                        side: 'buy',
-                        type: 'market',
-                        time_in_force: 'day'
-                      });
+                      if (qty > 0) {
+                        console.log('Buying: '+qty);
+
+                        alpaca.createOrder({
+                          symbol: index.symbol,
+                          qty: qty,
+                          side: 'buy',
+                          type: 'market',
+                          time_in_force: 'day'
+                        });
+                      } else {
+                        console.log('Not enough moneys')
+                      }
                     } else {
-                      alpaca.getPosition(stock).then(function(position) {
+                      alpaca.getPosition(index.symbol).then(function(position) {
                         console.log('Selling: '+position.qty);
 
                         alpaca.createOrder({
