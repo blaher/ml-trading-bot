@@ -7,7 +7,13 @@
     "dialect": "mysql",
     "alpha_host": "https://www.alphavantage.co",
     "alpha_key": "30UYPM9M4BHQ6JWZ",
-    "factor": 10000
+    "factor": 10000,
+    "alpaca_endpoint": "https://paper-api.alpaca.markets",
+    "alpaca": {
+      "keyId": "PK5GGDW4SQ2YC6P5G465",
+      "secretKey": "LDvmKolLCcLdHNfdeCv/02bWkY499JhJjFMiLcH3",
+      "paper": true
+    }
   },
   "test": {
     "username": "flex",
@@ -17,7 +23,13 @@
     "dialect": "mysql",
     "alpha_host": "https://www.alphavantage.co",
     "alpha_key": "30UYPM9M4BHQ6JWZ",
-    "factor": 10000
+    "factor": 10000,
+    "alpaca_endpoint": "https://paper-api.alpaca.markets",
+    "alpaca": {
+      "keyId": "PK5GGDW4SQ2YC6P5G465",
+      "secretKey": "LDvmKolLCcLdHNfdeCv/02bWkY499JhJjFMiLcH3",
+      "paper": true
+    }
   },
   "production": {
     "username": "flex",
@@ -27,6 +39,12 @@
     "dialect": "mysql",
     "alpha_host": "https://www.alphavantage.co",
     "alpha_key": "30UYPM9M4BHQ6JWZ",
-    "factor": 10000
+    "factor": 10000,
+    "alpaca_endpoint": "https://paper-api.alpaca.markets",
+    "alpaca": {
+      "keyId": "PK5GGDW4SQ2YC6P5G465",
+      "secretKey": "LDvmKolLCcLdHNfdeCv/02bWkY499JhJjFMiLcH3",
+      "paper": true
+    }
   }
 }
