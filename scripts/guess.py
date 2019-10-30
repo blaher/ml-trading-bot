@@ -8,6 +8,7 @@ from joblib import load
 #Read data from stdin
 def read_in():
     lines = sys.stdin.readlines()
+
     #Since our input would only be having one line, parse our JSON data from that
     return json.loads(lines[0], object_pairs_hook=OrderedDict)
 
@@ -95,4 +96,4 @@ with tf.Session() as net:
 clf = load('models/tree.joblib')
 df = pd.DataFrame(data, columns=data.keys(), index=[0])
 
-print(clf.predict(df)[0])
+print(round(clf.predict(df)[0]))

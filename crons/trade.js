@@ -11,6 +11,7 @@ const sequelize = require('sequelize');
 const child_process = require('child_process');
 
 function load_init(models) {
+  //TODO: Sell all stocks at end of day
   alpaca.getClock().then(function(clock) {
     if (clock.is_open) {
       models.Indexes.findAll({
