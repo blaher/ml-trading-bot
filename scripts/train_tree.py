@@ -59,6 +59,9 @@ def get_errors(leaf_nodes, train_x, test_x, train_y, test_y):
             preds_val[i] = 0
     preds_val = [int(round(x)) for x in list(preds_val)]
 
+    print('Prediction values:')
+    print(preds_val)
+
     errors = 0
     for i in range(length):
         if (preds_val[i] != test_y[i]):
@@ -135,10 +138,12 @@ first = 1
 test_len = len(test_y)
 errors = test_len
 lowest_errors = errors
-nodes = 2
+min_nodes = 2
+max_nodes = 2048
+nodes = min_nodes
 #TODO: Thread this
 #TODO: Repeat node batches
-while lowest_errors/test_len > 0.2:
+while lowest_errors/test_len > 0.2 and i <= 10240:
     print("Run:  %d" %(i+1))
     errors, model = get_errors(nodes, train_x, test_x, train_y, test_y)
 
@@ -152,6 +157,9 @@ while lowest_errors/test_len > 0.2:
     print("Lowest Errors: ", lowest_errors)
 
     nodes += 1
+    if nodes > max_nodes:
+        nodes = min_nodes
+
     i += 1
 
 print("Absolute Lowest Mean Absolute Error:  %d" %(lowest_errors))
