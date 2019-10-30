@@ -134,6 +134,7 @@ while 1 == 1:
         lowest_mse = mse_test[-1]
 
         # Prediction
+        #TODO: Setup Multi-GPU
         pred = net.run(out, feed_dict={X: X_test})
         line2.set_ydata(pred)
         plt.title('Epoch ' + str(e))

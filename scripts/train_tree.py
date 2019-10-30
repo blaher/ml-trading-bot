@@ -25,15 +25,17 @@ features = [
     'indicator_HT_PHASOR_value2'
 ]
 
+#TODO: Thread this
+#TODO: Setup Multi-GPU
 def insert_neural(data, net, out):
-    data_trasnform = data.drop(['minute', 'trade'], axis=1)
-    data_trasnform = data_trasnform.drop(features, axis=1)
+    data_transform = data.drop(['minute', 'trade'], axis=1)
+    data_transform = data_transform.drop(features, axis=1)
     data_len = len(data)
     neural_predictions = list()
-    print(data_trasnform)
+    print(data_transform)
 
     for i in range(data_len):
-        row = data_trasnform.loc[[i]]
+        row = data_transform.loc[[i]]
         print(row)
         prediction = net.run(out, feed_dict={X: row})
         neural_predictions.append(prediction)
@@ -70,7 +72,7 @@ data = pandas.read_csv(file_path, skipinitialspace=True)
 stock_data = data.drop(features, axis=1)
 stock_data = stock_data.drop(['minute', 'trade'], axis=1)
 
-#modulularize this so it's not repetitive in trainings
+#TODO: modulularize this so it's not repetitive in trainings
 n_stocks = stock_data.shape[1]
 
 # Neurons
@@ -133,6 +135,8 @@ test_len = len(test_y)
 errors = test_len
 lowest_errors = errors
 nodes = 2
+#TODO: Thread this
+#TODO: Repeat node batches
 while lowest_errors/test_len > 0.2:
     print("Run:  %d" %(i+1))
     errors, model = get_errors(nodes, train_x, test_x, train_y, test_y)
