@@ -69,8 +69,7 @@ function load_init(models) {
                 console.log('Guess: '+guess);
 
                 alpaca.getAccount().then(function(account) {
-                  //TODO: Use margin amount and figure out actual value minus open orders
-                  amount = account.cash;
+                  amount = account.buying_power*0.9;
                   console.log('Amount: '+amount);
 
                   alpaca.getBars('minute', index.symbol, {
@@ -80,7 +79,7 @@ function load_init(models) {
                     console.log('Stock Price: '+current_stock_price);
 
                     if (guess) {
-                      var qty = Math.floor(amount/current_stock_price);
+                      var qty = Math.floor(amount/current_stock_price)-1;
 
                       if (qty > 0) {
                         console.log('Buying: '+qty);

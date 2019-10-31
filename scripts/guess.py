@@ -99,5 +99,5 @@ if prediction >= 0.5:
     print('1')
 else:
     print('0')
-
+#TODO: Figure out why 0 is NaN or empty
 #TODO: Send risk factor
