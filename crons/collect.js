@@ -1,11 +1,12 @@
-console.log('Setting up...');
-
 var env = process.env.NODE_ENV || 'development';
 var config = require('../config/config.json')[env];
 const models = require('../models')
 
 const express = require('express');
 const router = express.Router();
+
+const Alpaca = require('@alpacahq/alpaca-trade-api');
+const alpaca = new Alpaca(config.alpaca);
 const moment = require('moment');
 const unirest = require("unirest");
 
@@ -317,11 +318,17 @@ function load_init(models) {
   const upper_minute = get_upper_minute();
 
   if (current_minute.isBefore(upper_minute) && current_minute.isAfter(lower_minute)) {
-    console.log('Starting Collect...');
+    alpaca.getClock().then(function(clock) {
+      if (clock.is_open) {
+        console.log('Starting Collect...');
 
-    loop_through(minute, models);
+        loop_through(minute, models);
 
-    console.log('Finished Collect');
+        console.log('Finished Collect');
+      } else {
+        console.log('Trading not open')
+      }
+    });
   } else {
     console.log(current_minute.isBefore(upper_minute));
     console.log('Markets not open')

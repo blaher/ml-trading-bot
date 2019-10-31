@@ -1,3 +1,5 @@
+console.log('Setting up...');
+
 var port = process.env.PORT || 8084;
 
 var express = require('express');
