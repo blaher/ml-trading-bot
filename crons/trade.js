@@ -21,9 +21,8 @@ function load_init(models) {
           console.log('Data: '+index.symbol);
 
           var select = 'ip.minute';
-          select += ', ip.trade-1 as trade';
           select += ', ip.open, ip.high, ip.low, ip.close';
-          var columns = ['minute', 'trade', 'open', 'high', 'low', 'close'];
+          var columns = ['minute', 'open', 'high', 'low', 'close'];
 
           index.Indicators.forEach(function(indicator) {
             var i = 1;
@@ -44,7 +43,7 @@ function load_init(models) {
             }
           });
 
-          var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? ORDER BY ip.minute LIMIT 1;';
+          var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? ORDER BY ip.minute DESC LIMIT 1;';
 
           models.sequelize.query(sql, {
             replacements: [index.id],
@@ -55,7 +54,6 @@ function load_init(models) {
 
               py = spawn('python3', ['scripts/guess.py']);
               dataString = '';
-              result = 1;
 
               py.stdout.on('data', function(data) {
                 dataString += data.toString();
@@ -67,6 +65,7 @@ function load_init(models) {
 
               py.stdout.on('end', function() {
                 guess = parseInt(dataString);
+                console.log(dataString);
                 console.log('Guess: '+guess);
 
                 alpaca.getAccount().then(function(account) {

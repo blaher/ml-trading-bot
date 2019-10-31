@@ -17,7 +17,6 @@ lines = read_in()
 
 data = lines.copy()
 data.pop('minute')
-data.pop('trade')
 
 data_copy = data.copy()
 for element in data_copy:
@@ -32,7 +31,6 @@ for element in data_copy:
 
 stock_data = lines.copy()
 stock_data.pop('minute')
-stock_data.pop('trade')
 stock_data.pop('open')
 stock_data.pop('high')
 stock_data.pop('low')
@@ -96,5 +94,10 @@ with tf.Session() as net:
 clf = load('models/tree.joblib')
 df = pd.DataFrame(data, columns=data.keys(), index=[0])
 
+prediction = clf.predict(df)[0]
+if prediction >= 0.5:
+    print('1')
+else:
+    print('0')
+
 #TODO: Send risk factor
-print(round(clf.predict(df)[0]))
