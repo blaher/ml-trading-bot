@@ -96,4 +96,5 @@ with tf.Session() as net:
 clf = load('models/tree.joblib')
 df = pd.DataFrame(data, columns=data.keys(), index=[0])
 
+#TODO: Send risk factor
 print(round(clf.predict(df)[0]))

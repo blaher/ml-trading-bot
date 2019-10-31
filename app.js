@@ -1,4 +1,5 @@
 console.log('Setting up...');
+//TODO: Add logstash or something for log monitoring
 
 var port = process.env.PORT || 8084;
 
