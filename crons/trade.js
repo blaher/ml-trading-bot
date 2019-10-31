@@ -15,10 +15,31 @@ function get_minute() {
   return moment().format('YYYY-MM-DD HH:mm:00');
 }
 
+function get_minute_moment(minute) {
+  return moment(minute, 'YYYY-MM-DD HH:mm:ss');
+}
+
+function get_min_minute() {
+  return moment('09:30:00', 'HH:mm:ss');
+}
+
+function get_max_minute() {
+  return moment('16:00:00', 'HH:mm:ss');
+}
+
+function get_lower_minute() {
+  return get_min_minute();
+}
+
+function get_upper_minute() {
+  return get_max_minute().subtract(1, 'minutes');
+}
+
 function load_init(models) {
   console.log('-------');
-  console.log('Current Minute: '+get_minute());
-  //TODO: Sell all stocks at end of day
+  const current_minute = get_minute();
+  console.log('Current Minute: '+current_minute);
+
   alpaca.getClock().then(function(clock) {
     if (clock.is_open) {
       models.Indexes.findAll({
@@ -86,7 +107,21 @@ function load_init(models) {
                     current_stock_price = latest_bars[index.symbol][0].c;
                     //console.log('Stock Price: '+current_stock_price);
 
-                    if (guess) {
+                    if (get_upper_minute().isSameOrBefore(get_minute_moment(current_minute))) {
+                      alpaca.getPosition(index.symbol).then(function(position) {
+                        console.log('Selling all: '+position.qty);
+
+                        alpaca.createOrder({
+                          symbol: index.symbol,
+                          qty: position.qty,
+                          side: 'sell',
+                          type: 'market',
+                          time_in_force: 'day'
+                        });
+                      }, function() {
+                        console.log('No stocks to sell');
+                      });
+                    } else if (guess) {
                       var qty = Math.floor(amount/current_stock_price)-1;
 
                       if (qty > 0) {
