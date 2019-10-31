@@ -5,13 +5,19 @@ const models = require('../models')
 const express = require('express');
 const router = express.Router();
 
+const moment = require('moment');
 const Alpaca = require('@alpacahq/alpaca-trade-api');
 const alpaca = new Alpaca(config.alpaca);
 const sequelize = require('sequelize');
 const child_process = require('child_process');
 
+function get_minute() {
+  return moment().format('YYYY-MM-DD HH:mm:00');
+}
+
 function load_init(models) {
   console.log('-------');
+  console.log('Current Minute: '+get_minute());
   //TODO: Sell all stocks at end of day
   alpaca.getClock().then(function(clock) {
     if (clock.is_open) {
@@ -50,6 +56,8 @@ function load_init(models) {
             replacements: [index.id],
             type: sequelize.QueryTypes.SELECT
           }).then(function(rows) {
+            console.log('Data Minute: '+moment(rows[0].minute).format('YYYY-MM-DD HH:mm:00'));
+
             try {
               var spawn = child_process.spawn;
 
@@ -76,7 +84,7 @@ function load_init(models) {
                     limit: 1
                   }).then(function(latest_bars) {
                     current_stock_price = latest_bars[index.symbol][0].c;
-                    console.log('Stock Price: '+current_stock_price);
+                    //console.log('Stock Price: '+current_stock_price);
 
                     if (guess) {
                       var qty = Math.floor(amount/current_stock_price)-1;
@@ -130,13 +138,13 @@ function load_init(models) {
 }
 
 router.get('/', function(req, res) {
-  load_init(models);
+  setTimeout(load_init.bind(null, models), 5000);
 
   res.sendStatus(200);
 });
 
 router.post('/', function(req, res) {
-  load_init(models);
+  setTimeout(load_init.bind(null, models), 5000);
 
   res.sendStatus(200);
 });
