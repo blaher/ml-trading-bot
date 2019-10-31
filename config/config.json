@@ -13,7 +13,8 @@
       "keyId": "PKFWEWTZV6GJ8EOGHV3Z",
       "secretKey": "AfVlE9q27hZQKUTULK8uSjeJVsC3LqGqggPtdfGy",
       "paper": true
-    }
+    },
+    "logging": false
   },
   "test": {
     "username": "flex",
@@ -29,7 +30,8 @@
       "keyId": "PKFWEWTZV6GJ8EOGHV3Z",
       "secretKey": "AfVlE9q27hZQKUTULK8uSjeJVsC3LqGqggPtdfGy",
       "paper": true
-    }
+    },
+    "logging": false
   },
   "production": {
     "username": "flex",
@@ -45,6 +47,7 @@
       "keyId": "PKFWEWTZV6GJ8EOGHV3Z",
       "secretKey": "AfVlE9q27hZQKUTULK8uSjeJVsC3LqGqggPtdfGy",
       "paper": true
-    }
+    },
+    "logging": false
   }
 }

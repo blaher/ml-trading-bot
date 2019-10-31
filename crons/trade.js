@@ -11,6 +11,7 @@ const sequelize = require('sequelize');
 const child_process = require('child_process');
 
 function load_init(models) {
+  console.log('-------');
   //TODO: Sell all stocks at end of day
   alpaca.getClock().then(function(clock) {
     if (clock.is_open) {
@@ -65,7 +66,6 @@ function load_init(models) {
 
               py.stdout.on('end', function() {
                 guess = parseInt(dataString);
-                console.log(dataString);
                 console.log('Guess: '+guess);
 
                 alpaca.getAccount().then(function(account) {
