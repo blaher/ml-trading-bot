@@ -47,15 +47,10 @@ router.get('/', function(req, res) {
       }).then(function(rows) {
         const starting_value = 120000;
         var value = starting_value;
-        var trades = [];
 
         rows.forEach(function(row, i) {
           columns.forEach(function(column) {
-            console.log(config.factor);
-            console.log(rows[i][column]);
             rows[i][column] = row[column]/config.factor;
-            console.log(rows[i][column]);
-            console.log('');
           });
         });
 
@@ -83,9 +78,9 @@ router.get('/', function(req, res) {
               if (isNaN(guess)) {
                 guess = 0;
               }
-console.log(rows[i+1].open);
+
               const current_stock_price = ((rows[i+1].open*config.factor)+(rows[i+1].close*config.factor))/2/config.factor;
-              const future_stock_price = ((row.open*config.factor)+(row.close*config.factor))/2/config.factor;
+              const future_stock_price = ((rows[i+2].open*config.factor)+(rows[i+2].close*config.factor))/2/config.factor;
 
               console.log('-------');
               console.log('Minute: '+moment(row.minute)
@@ -111,22 +106,17 @@ console.log(rows[i+1].open);
               }
 
               console.log('Value: $'+value);
-              trades.push(guess);
             });
 
             py.stdin.write(JSON.stringify(row));
             py.stdin.end();
           }, wait_time);
         });
-
-        res.json({
-          starting_value: starting_value,
-          value: value,
-          trades: trades
-        });
       });
     });
   });
+
+  res.sendStatus(200);
 });
 
 module.exports = router;
