@@ -50,7 +50,7 @@ function load_init(models) {
 
           var select = 'ip.minute';
           select += ', ip.open, ip.high, ip.low, ip.close';
-          var columns = ['minute', 'open', 'high', 'low', 'close'];
+          var columns = ['open', 'high', 'low', 'close'];
 
           index.Indicators.forEach(function(indicator) {
             var i = 1;
@@ -77,7 +77,12 @@ function load_init(models) {
             replacements: [index.id],
             type: sequelize.QueryTypes.SELECT
           }).then(function(rows) {
-            console.log('Data Minute: '+moment(rows[0].minute).format('YYYY-MM-DD HH:mm:00'));
+            var row = rows[0];
+            console.log('Data Minute: '+moment(row.minute).format('YYYY-MM-DD HH:mm:00'));
+
+            columns.forEach(function(column) {
+              row[column] = row[column]/config.factor;
+            });
 
             try {
               var spawn = child_process.spawn;
@@ -156,7 +161,7 @@ function load_init(models) {
                 });
               });
 
-              py.stdin.write(JSON.stringify(rows[0]));
+              py.stdin.write(JSON.stringify(row));
               py.stdin.end();
             } catch(error) {
               console.log(error);
