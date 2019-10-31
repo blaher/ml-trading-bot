@@ -70,6 +70,7 @@ function load_init(models) {
                 console.log('Guess: '+guess);
 
                 alpaca.getAccount().then(function(account) {
+                  //TODO: Use margin amount and figure out actual value minus open orders
                   amount = account.cash;
                   console.log('Amount: '+amount);
 
