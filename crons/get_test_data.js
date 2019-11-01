@@ -16,7 +16,7 @@ router.get('/', function(req, res) {
 
       var select = 'ip.minute';
       select += ', ip.open, ip.high, ip.low, ip.close';
-      var columns = ['minute', 'open', 'high', 'low', 'close'];
+      var columns = ['open', 'high', 'low', 'close'];
 
       index.Indicators.forEach(function(indicator) {
         var i = 1;
@@ -43,6 +43,10 @@ router.get('/', function(req, res) {
         replacements: [index.id],
         type: sequelize.QueryTypes.SELECT
       }).then(function(rows) {
+        columns.forEach(function(column) {
+          rows[0][column] = rows[0][column]/config.factor;
+        });
+
         console.log('');
         console.log('');
         console.log(JSON.stringify(rows[0]));

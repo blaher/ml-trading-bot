@@ -24,7 +24,7 @@ for element in data_copy:
         data.pop(element)
     else:
         if data[element]:
-            data[element] = float(data[element])/10000
+            data[element] = float(data[element])
         else:
             #TODO: Fix the null in data collecting
             data[element] = 0
@@ -41,7 +41,7 @@ for element in stock_data_copy:
     if element.startswith('indicator_'):
         stock_data.pop(element)
     else:
-        stock_data[element] = float(stock_data[element])/10000
+        stock_data[element] = float(stock_data[element])
 
 #TODO: modulularize this so it's not repetitive in trainings
 n_stocks = len(stock_data)
@@ -99,5 +99,7 @@ if prediction >= 0.5:
     print('1')
 else:
     print('0')
+print(prediction)
+print(data['neural_prediction'])
 #TODO: Figure out why 0 is NaN or empty
 #TODO: Send risk factor

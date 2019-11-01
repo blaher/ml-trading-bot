@@ -73,7 +73,10 @@ router.get('/', function(req, res) {
             });
 
             py.stdout.on('end', function() {
-              guess = parseInt(dataString);
+              const datas = dataString.split(/\r?\n/);
+              guess = parseInt(datas[0]);
+              weight = parseFloat(datas[1]);
+              neural = parseFloat(datas[2]);
 
               if (isNaN(guess)) {
                 guess = 0;
@@ -89,6 +92,7 @@ router.get('/', function(req, res) {
                 .add(1, 'minutes')
                 .format('YYYY-MM-DD HH:mm:00'));
               console.log('Guess: '+guess);
+              console.log('Weight: '+weight);
               console.log('Stock Price: '+current_stock_price);
               console.log('Future Stock Price: '+future_stock_price);
 

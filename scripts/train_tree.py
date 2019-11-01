@@ -68,7 +68,7 @@ def get_errors(leaf_nodes, train_x, test_x, train_y, test_y):
             errors += 1
 
     print("Leaf nodes: %d  \t Errors:  %d out of %d" %(leaf_nodes, errors, length))
-    return(errors, model)
+    return(errors, model, preds_val)
 
 file_path = 'data/SPY_tree.csv'
 data = pandas.read_csv(file_path, skipinitialspace=True)
@@ -124,7 +124,6 @@ with tf.Session() as net:
     data = insert_neural(data, net, out)
 
 data = data.dropna(axis=0)
-
 print(data)
 
 y = list(data.trade)
@@ -141,20 +140,27 @@ lowest_errors = errors
 min_nodes = 2
 max_nodes = 2048
 nodes = min_nodes
+lowest_error_nodes = 0
+lowest_error_predictions = list()
 #TODO: Thread this
 #TODO: Repeat node batches
 while lowest_errors/test_len > 0.2 and i <= 10240:
     print("Run:  %d" %(i+1))
-    errors, model = get_errors(nodes, train_x, test_x, train_y, test_y)
+    errors, model, predictions = get_errors(nodes, train_x, test_x, train_y, test_y)
 
     if first == 1 or errors < lowest_errors:
         lowest_errors = errors
         lowest_model = model
+        lowest_error_nodes = nodes
+        lowest_error_predictions = predictions
 
         dump(lowest_model, 'models/tree.joblib')
 
         first = 0
     print("Lowest Errors: ", lowest_errors)
+    print("Lowest Error Nodes: ", lowest_error_nodes)
+    print("Lowest Error Predicitions:")
+    print(lowest_error_predictions)
 
     nodes += 1
     if nodes > max_nodes:

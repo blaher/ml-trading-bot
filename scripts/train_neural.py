@@ -11,7 +11,10 @@ from warnings import simplefilter
 simplefilter(action='ignore', category=FutureWarning)
 
 # Import data
-data = pd.read_csv('data/SPY_neural.csv')
+data = pd.read_csv('data/SPY_neural.csv', delimiter=', ', encoding="utf-8-sig")
+print(data)
+y_min = data['futurePrice'].min()
+y_max = data['futurePrice'].max()
 
 # Drop minute variable
 data = data.drop(['minute'], 1)
@@ -34,8 +37,8 @@ data_test = data[np.arange(test_start, test_end), :]
 # Scale data
 scaler = MinMaxScaler(feature_range=(-1, 1))
 scaler.fit(data_train)
-data_train = scaler.transform(data_train)
-data_test = scaler.transform(data_test)
+#data_train = scaler.transform(data_train)
+#data_test = scaler.transform(data_test)
 
 # Build X and y
 X_train = data_train[:, 1:]
@@ -99,6 +102,8 @@ net.run(tf.global_variables_initializer())
 # Setup plot
 plt.ion()
 fig = plt.figure()
+axes = plt.gca()
+axes.set_ylim([y_min, y_max])
 ax1 = fig.add_subplot(111)
 line1, = ax1.plot(y_test)
 line2, = ax1.plot(y_test * 0.5)
