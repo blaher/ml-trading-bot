@@ -45,7 +45,7 @@ router.get('/', function(req, res) {
         replacements: [index.id],
         type: sequelize.QueryTypes.SELECT
       }).then(function(rows) {
-        const starting_value = 120000;
+        const starting_value = 30000;
         var value = starting_value;
 
         rows.forEach(function(row, i) {
@@ -97,7 +97,7 @@ router.get('/', function(req, res) {
               console.log('Future Stock Price: '+future_stock_price);
 
               if (guess === 1) {
-                const qty = Math.floor((value*0.9)/current_stock_price)-1;
+                const qty = Math.floor((value*4*0.9)/current_stock_price)-1;
                 const purchase_amount = qty * current_stock_price;
                 const sell_amount = qty * future_stock_price;
                 const profit = sell_amount - purchase_amount;
@@ -106,6 +106,7 @@ router.get('/', function(req, res) {
                 console.log('Quantity: '+qty);
                 console.log('Purchase Amount: '+purchase_amount);
                 console.log('Sell Amount: '+sell_amount);
+                //TODO: Floor profit on 2nd decimal place
                 console.log('Profit: '+profit);
 
                 value += profit;
