@@ -39,7 +39,7 @@ router.get('/', function(req, res) {
         }
       });
 
-      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? ORDER BY ip.minute ASC LIMIT 391;';
+      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? ORDER BY ip.minute ASC LIMIT 390;';
 
       models.sequelize.query(sql, {
         replacements: [index.id],
@@ -79,10 +79,12 @@ router.get('/', function(req, res) {
                 guess = 0;
               }
 
+              //TODO: App crashes on last two
               const current_stock_price = ((rows[i+1].open*config.factor)+(rows[i+1].close*config.factor))/2/config.factor;
               const future_stock_price = ((rows[i+2].open*config.factor)+(rows[i+2].close*config.factor))/2/config.factor;
 
               console.log('-------');
+              console.log(i);
               console.log('Minute: '+moment(row.minute)
                 .add(1, 'minutes')
                 .format('YYYY-MM-DD HH:mm:00'));
