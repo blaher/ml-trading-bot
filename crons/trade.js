@@ -53,6 +53,10 @@ function load_init(models) {
           var columns = ['open', 'high', 'low', 'close'];
 
           index.Indicators.forEach(function(indicator) {
+            if (!indicator.values) {
+              indicator.values = 1;
+            }
+
             var i = 1;
             while (i <= indicator.values) {
               select += ', (SELECT iiv.value'+i+' FROM IndexIndicatorValues AS iiv WHERE iiv.indicatorId = '+indicator.id+' AND iiv.indexId = ip.indexId AND iiv.minute = ip.minute) AS indicator_'+indicator.symbol+'_value'+i;
@@ -62,6 +66,7 @@ function load_init(models) {
               i++;
             }
           });
+          console.log(columns);
 
           index.Stocks.forEach(function(stock) {
             if (stock.symbol !== 'GL') {
@@ -103,6 +108,10 @@ function load_init(models) {
                 guess = parseInt(datas[0]);
                 weight = parseFloat(datas[1]);
                 neural = parseFloat(datas[2]);
+
+                console.log('Guess: '+guess);
+                console.log('Weight: '+weight);
+                console.log('Neural Prediction: '+neural);
 
                 if (isNaN(guess)) {
                   guess = 0;
