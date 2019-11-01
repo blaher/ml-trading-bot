@@ -99,8 +99,14 @@ function load_init(models) {
               });
 
               py.stdout.on('end', function() {
-                guess = parseInt(dataString);
-                console.log('Guess: '+guess);
+                const datas = dataString.split(/\r?\n/);
+                guess = parseInt(datas[0]);
+                weight = parseFloat(datas[1]);
+                neural = parseFloat(datas[2]);
+
+                if (isNaN(guess)) {
+                  guess = 0;
+                }
 
                 alpaca.getAccount().then(function(account) {
                   amount = account.buying_power*0.9;
