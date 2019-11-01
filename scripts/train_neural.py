@@ -100,6 +100,7 @@ opt = tf.train.AdamOptimizer().minimize(mse)
 net.run(tf.global_variables_initializer())
 
 # Setup plot
+#TODO: Set correct date labels
 plt.ion()
 fig = plt.figure()
 axes = plt.gca()
