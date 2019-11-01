@@ -39,7 +39,7 @@ router.get('/', function(req, res) {
         }
       });
 
-      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? ORDER BY ip.minute ASC LIMIT 390;';
+      var sql = 'SELECT s.* FROM (SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? ORDER BY ip.minute DESC LIMIT 393) AS s ORDER BY s.minute ASC;';
 
       models.sequelize.query(sql, {
         replacements: [index.id],
@@ -57,6 +57,10 @@ router.get('/', function(req, res) {
         var wait_time = 0;
         rows.forEach(function(row, i) {
           wait_time += 2000;
+
+          if (i >= 390) {
+            return;
+          }
 
           setTimeout(function(){
             var spawn = child_process.spawn;
@@ -82,7 +86,6 @@ router.get('/', function(req, res) {
                 guess = 0;
               }
 
-              //TODO: App crashes on last two
               const current_stock_price = ((rows[i+1].open*config.factor)+(rows[i+1].close*config.factor))/2/config.factor;
               const future_stock_price = ((rows[i+2].open*config.factor)+(rows[i+2].close*config.factor))/2/config.factor;
 
@@ -97,19 +100,18 @@ router.get('/', function(req, res) {
               console.log('Future Stock Price: '+future_stock_price);
 
               if (guess === 1) {
-                const qty = Math.floor((value*4*0.9)/current_stock_price)-1;
-                const purchase_amount = qty * current_stock_price;
-                const sell_amount = qty * future_stock_price;
-                const profit = sell_amount - purchase_amount;
+                const qty = Math.floor((value*4*0.9)/current_stock_price);
+                const purchase_amount = Math.ceil(qty*(current_stock_price*100))/100;
+                const sell_amount = Math.floor(qty*(future_stock_price*100))/100;
+                const profit = ((sell_amount*100)-(purchase_amount*100))/100;
 
                 console.log('Buying...');
                 console.log('Quantity: '+qty);
                 console.log('Purchase Amount: '+purchase_amount);
                 console.log('Sell Amount: '+sell_amount);
-                //TODO: Floor profit on 2nd decimal place
                 console.log('Profit: '+profit);
 
-                value += profit;
+                value = ((value*100)+(profit*100))/100;
               }
 
               console.log('Value: $'+value);

@@ -133,7 +133,7 @@ function load_init(models) {
                         console.log('No stocks to sell');
                       });
                     } else if (guess) {
-                      var qty = Math.floor(amount/current_stock_price)-1;
+                      var qty = Math.floor(amount/current_stock_price);
 
                       if (qty > 0) {
                         console.log('Buying: '+qty);
