@@ -66,7 +66,6 @@ function load_init(models) {
               i++;
             }
           });
-          console.log(columns);
 
           index.Stocks.forEach(function(stock) {
             if (stock.symbol !== 'GL') {
