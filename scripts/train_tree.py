@@ -1,3 +1,5 @@
+import threading
+import time
 import pandas
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
@@ -83,6 +85,9 @@ features = [
   'indicator_HT_PHASOR_value2'
 ]
 
+def predict(out, row):
+    return net.run(out, feed_dict={X: row})[0][0]
+
 #TODO: Thread this
 #TODO: Setup Multi-GPU
 def insert_neural(data, net, out):
@@ -92,41 +97,21 @@ def insert_neural(data, net, out):
     neural_predictions = list()
     print(data_transform)
 
+    start = time.process_time()
     for i in range(data_len):
+        print(i)
         row = data_transform.loc[[i]]
-        print(row)
-        prediction = net.run(out, feed_dict={X: row})[0][0]
+        #print(row)
+        prediction = predict(out, row)
         print(prediction)
         neural_predictions.append(prediction)
+    print('Time Taken:')
+    print(time.process_time()-start)
 
     #TODO: Add Prediciton Delta against close
     data['neural_prediction'] = neural_predictions
 
     return data
-
-def get_errors(leaf_nodes, train_x, test_x, train_y, test_y):
-    model = RandomForestRegressor(max_leaf_nodes=leaf_nodes)
-    model.fit(train_x, train_y)
-
-    preds_val = model.predict(test_x)
-    length = len(preds_val)
-    for i in range(length):
-        if preds_val[i] >= 0.5:
-            preds_val[i] = 1
-        else:
-            preds_val[i] = 0
-    preds_val = [int(round(x)) for x in list(preds_val)]
-
-    print('Prediction values:')
-    print(preds_val)
-
-    errors = 0
-    for i in range(length):
-        if (preds_val[i] != test_y[i]):
-            errors += 1
-
-    print("Leaf nodes: %d  \t Errors:  %d out of %d" %(leaf_nodes, errors, length))
-    return(errors, model, preds_val)
 
 file_path = 'data/SPY_tree.csv'
 data = pandas.read_csv(file_path, skipinitialspace=True)
@@ -193,32 +178,71 @@ train_x, test_x, train_y, test_y = train_test_split(x, y, random_state = 0)
 i = 0
 first = 1
 test_len = len(test_y)
-errors = test_len
-lowest_errors = errors
 min_nodes = 2
 max_nodes = 2048
 nodes = min_nodes
 lowest_error_nodes = 0
 lowest_error_predictions = list()
-#TODO: Thread this
-#TODO: Repeat node batches
-while lowest_errors/test_len > 0.2 and i <= 10240:
-    print("Run:  %d" %(i+1))
+
+def predict_thread(nodes, train_x, test_x, train_y, test_y):
+    global lowest_errors
+
+    def get_errors(leaf_nodes, train_x, test_x, train_y, test_y):
+        start = time.process_time()
+
+        model = RandomForestRegressor(max_leaf_nodes=leaf_nodes)
+        model.fit(train_x, train_y)
+
+        preds_val = model.predict(test_x)
+        length = len(preds_val)
+        for i in range(length):
+            if preds_val[i] >= 0.5:
+                preds_val[i] = 1
+            else:
+                preds_val[i] = 0
+        preds_val = [int(round(x)) for x in list(preds_val)]
+
+        #print('Prediction values:')
+        #print(preds_val)
+
+        errors = 0
+        for i in range(length):
+            if (preds_val[i] != test_y[i]):
+                errors += 1
+
+        print("Leaf nodes: %d  \t Errors:  %d out of %d" %(leaf_nodes, errors, length))
+        #print(time.process_time()-start)
+        return(errors, model, preds_val)
+
     errors, model, predictions = get_errors(nodes, train_x, test_x, train_y, test_y)
 
-    if first == 1 or errors < lowest_errors:
+    if errors < lowest_errors:
         lowest_errors = errors
-        lowest_model = model
-        lowest_error_nodes = nodes
-        lowest_error_predictions = predictions
 
-        dump(lowest_model, 'models/tree.joblib')
+        dump(model, 'models/tree.joblib')
 
-        first = 0
-    print("Lowest Errors: ", lowest_errors)
-    print("Lowest Error Nodes: ", lowest_error_nodes)
-    print("Lowest Error Predicitions:")
-    print(lowest_error_predictions)
+        #print("Current Lowest Errors: ", errors)
+        #print("Current Lowest Error Nodes: ", nodes)
+        #print("Current Lowest Error Predicitions:")
+        #print(predictions)
+    else:
+        print('Not lowest errors')
+
+lowest_errors = test_len
+max_threads = 32
+max_runs = 10240
+
+start = time.process_time()
+while lowest_errors/test_len > 0.2 and i <= max_runs:
+    print("Run:  %d" %(i+1))
+
+    thread_instance = threading.Thread(target=predict_thread, args=(nodes, train_x, test_x, train_y, test_y))
+
+    while threading.active_count() >= max_threads:
+        pass
+    thread_instance.start()
+
+    print('Lowest errors: ', lowest_errors)
 
     nodes += 1
     if nodes > max_nodes:
@@ -226,4 +250,8 @@ while lowest_errors/test_len > 0.2 and i <= 10240:
 
     i += 1
 
-print("Absolute Lowest Mean Absolute Error:  %d" %(lowest_errors))
+while threading.active_count() > 1:
+    pass
+
+print("Absolute Lowest Errors:  %d" %(lowest_errors))
+print(time.process_time()-start)
