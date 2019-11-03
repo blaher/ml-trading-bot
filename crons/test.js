@@ -58,11 +58,16 @@ router.get('/', function(req, res) {
         var missed_value = value;
         var bad_value = value;
 
+        const trades = 390;
+        var right_trades = 0;
+
         rows.forEach(function(row, i) {
           columns.forEach(function(column) {
             rows[i][column] = row[column]/config.factor;
           });
         });
+
+        //TODO: Put the guesses up here in it's own loop waiting for all promises to complete, in order to speed up without having to wait 2 seconds each iteration
 
         //TODO: Figure out why 1 is coming before 0 sometimes
         //TODO: Find why first two are NaN sometimes
@@ -70,11 +75,26 @@ router.get('/', function(req, res) {
         rows.forEach(function(row, i) {
           wait_time += 2000;
 
-          if (i >= 390) {
+          if (i >= trades) {
+            if (i === rows.length-1) {
+              setTimeout(function() {
+                const trade_accuracy = (right_trades/trades)*100;
+                const total_profit = ((value*100)-(starting_value*100))/100;
+                const total_perfect_profit = ((perfect_value*100)-(starting_value*100))/100;
+                const profit_accuracy = ((total_profit*100)/(total_perfect_profit*100))*100;
+
+                console.log('-------');
+                console.log('Finsihed');
+                console.log('');
+                console.log('Trade Accuracy: '+trade_accuracy+'%');
+                console.log('Profit Accuracy: '+profit_accuracy+'%');
+              }, wait_time);
+            }
+
             return;
           }
 
-          setTimeout(function(){
+          setTimeout(function() {
             var spawn = child_process.spawn;
 
             py = spawn('python3', ['scripts/guess.py']);
@@ -136,8 +156,9 @@ router.get('/', function(req, res) {
                 console.log('Sell Amount: '+sell_amount);
                 console.log('Profit: '+profit);
 
-                if (profit > 0) {
+                if (profit >= 0) {
                   perfect_value = ((perfect_value*100)+(profit*100))/100;
+                  right_trades += 1;
                 } else {
                   bad_value = ((bad_value*100)+(profit*100))/100;
                 }
@@ -146,9 +167,11 @@ router.get('/', function(req, res) {
               } else {
                 console.log('Selling...');
 
-                if (profit > 0) {
+                if (profit >= 0) {
                   perfect_value = ((perfect_value*100)+(profit*100))/100;
                   missed_value = ((missed_value*100)+(profit*100))/100;
+                } else {
+                  right_trades += 1;
                 }
               }
 
@@ -164,8 +187,6 @@ router.get('/', function(req, res) {
             py.stdin.end();
           }, wait_time);
         });
-
-        //TODO: Add some final info like accuracy, index beat percentages
       });
     });
   });
