@@ -58,8 +58,8 @@ weight_initializer = tf.variance_scaling_initializer(mode="fan_avg", distributio
 bias_initializer = tf.zeros_initializer()
 
 # Placeholder
-X = tf.placeholder(dtype=tf.float32, shape=[None, n_stocks])
-Y = tf.placeholder(dtype=tf.float32, shape=[None])
+X = tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, n_stocks])
+Y = tf.compat.v1.placeholder(dtype=tf.float32, shape=[None])
 
 # Hidden weights
 W_hidden_1 = tf.Variable(weight_initializer([n_stocks, n_neurons_1]))
@@ -84,11 +84,11 @@ hidden_4 = tf.nn.relu(tf.add(tf.matmul(hidden_3, W_hidden_4), bias_hidden_4))
 # Output layer (transpose!)
 out = tf.transpose(tf.add(tf.matmul(hidden_4, W_out), bias_out))
 
-tf.global_variables_initializer()
+tf.compat.v1.global_variables_initializer()
 saver = tf.compat.v1.train.Saver()
-config = tf.ConfigProto()
+config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
-with tf.Session(config=config) as net:
+with tf.compat.v1.Session(config=config) as net:
     saver.restore(net, 'models/neural')
     df = pd.DataFrame(stock_data, columns=stock_data.keys(), index=[0])
     data['neural_prediction'] = net.run(out, feed_dict={X: df})[0][0]
