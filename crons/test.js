@@ -9,7 +9,7 @@ const moment = require('moment');
 const sequelize = require('sequelize');
 const child_process = require('child_process');
 
-const max_threads = 0; //TODO: Fix being able to thread
+const max_threads = 2;
 
 router.get('/', function(req, res) {
   //TODO: Add query parameter to back test against end date
@@ -82,7 +82,7 @@ router.get('/', function(req, res) {
                 var spawn = child_process.spawn;
 
                 py = spawn('python3', ['scripts/guess.py']);
-                dataString = '';
+                var dataString = '';
 
                 py.stdout.on('data', function(data) {
                   dataString += data.toString();
@@ -93,7 +93,7 @@ router.get('/', function(req, res) {
                 });
 
                 py.stderr.on('data', function(data) {
-                    //console.error(data.toString());
+                  //console.error(data.toString());
                 });
 
                 py.stdout.on('end', function() {
@@ -140,7 +140,7 @@ router.get('/', function(req, res) {
                 const profit_accuracy = ((total_profit*100)/(total_perfect_profit*100))*100;
 
                 console.log('-------');
-                console.log('Finsihed');
+                console.log('Finished');
                 console.log('');
                 console.log('Trade Accuracy: '+trade_accuracy+'%');
                 console.log('Profit Accuracy: '+profit_accuracy+'%')

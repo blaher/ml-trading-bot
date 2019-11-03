@@ -89,6 +89,7 @@ function load_init(models) {
             });
 
             try {
+              console.timeStart('prediction');
               var spawn = child_process.spawn;
 
               py = spawn('python3', ['scripts/guess.py']);
@@ -103,6 +104,8 @@ function load_init(models) {
               });
 
               py.stdout.on('end', function() {
+                console.timeEnd('prediction');
+
                 const datas = dataString.split(/\r?\n/);
                 guess = parseInt(datas[0]);
                 weight = parseFloat(datas[1]);
