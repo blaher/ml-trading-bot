@@ -67,3 +67,4 @@ models/checkpoint
 models/neural.*
 data/SPY_neural.csv
 data/SPY_tree.csv
+data/test_results.txt

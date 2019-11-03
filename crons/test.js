@@ -58,6 +58,11 @@ router.get('/', function(req, res) {
           });
         });
 
+        //TODO: Figure out why 1 is coming before 0
+        //TODO: Find why first two are NaN
+        //TODO: Show Index comparios
+        //TODO: Show what profit was missed on
+        //TODO: Show what profit was lost
         var wait_time = 0;
         rows.forEach(function(row, i) {
           wait_time += 2000;
