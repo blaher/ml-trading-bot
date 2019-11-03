@@ -19,6 +19,10 @@ router.get('/', function(req, res) {
       var columns = ['open', 'high', 'low', 'close'];
 
       index.Indicators.forEach(function(indicator) {
+        if (!indicator.values) {
+          indicator.values = 1;
+        }
+        
         var i = 1;
         while (i <= indicator.values) {
           select += ', (SELECT iiv.value'+i+' FROM IndexIndicatorValues AS iiv WHERE iiv.indicatorId = '+indicator.id+' AND iiv.indexId = ip.indexId AND iiv.minute = ip.minute) AS indicator_'+indicator.symbol+'_value'+i;

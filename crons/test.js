@@ -24,7 +24,7 @@ router.get('/', function(req, res) {
         if (!indicator.values) {
           indicator.values = 1;
         }
-        
+
         var i = 1;
         while (i <= indicator.values) {
           select += ', (SELECT iiv.value'+i+' FROM IndexIndicatorValues AS iiv WHERE iiv.indicatorId = '+indicator.id+' AND iiv.indexId = ip.indexId AND iiv.minute = ip.minute) AS indicator_'+indicator.symbol+'_value'+i;
@@ -80,7 +80,12 @@ router.get('/', function(req, res) {
               console.log(error);
             });
 
+            /*py.stderr.on('data', function(data) {
+                console.error(data.toString());
+            });*/
+
             py.stdout.on('end', function() {
+              //console.log(dataString);
               const datas = dataString.split(/\r?\n/);
               guess = parseInt(datas[0]);
               weight = parseFloat(datas[1]);
@@ -100,6 +105,7 @@ router.get('/', function(req, res) {
                 .format('YYYY-MM-DD HH:mm:00'));
               console.log('Guess: '+guess);
               console.log('Weight: '+weight);
+              console.log('Neural Prediction: '+neural);
               console.log('Stock Price: '+current_stock_price);
               console.log('Future Stock Price: '+future_stock_price);
 
