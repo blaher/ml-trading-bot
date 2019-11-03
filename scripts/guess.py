@@ -86,7 +86,9 @@ out = tf.transpose(tf.add(tf.matmul(hidden_4, W_out), bias_out))
 
 tf.global_variables_initializer()
 saver = tf.compat.v1.train.Saver()
-with tf.Session() as net:
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+with tf.Session(config=config) as net:
     saver.restore(net, 'models/neural')
     df = pd.DataFrame(stock_data, columns=stock_data.keys(), index=[0])
     data['neural_prediction'] = net.run(out, feed_dict={X: df})[0][0]

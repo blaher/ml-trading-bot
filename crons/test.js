@@ -9,6 +9,8 @@ const moment = require('moment');
 const sequelize = require('sequelize');
 const child_process = require('child_process');
 
+const max_threads = 0; //TODO: Fix being able to thread
+
 router.get('/', function(req, res) {
   //TODO: Add query parameter to back test against end date
 
@@ -61,23 +63,77 @@ router.get('/', function(req, res) {
         const trades = 390;
         var right_trades = 0;
 
+        console.time('guesses');
+        var promises = [];
         rows.forEach(function(row, i) {
           columns.forEach(function(column) {
             rows[i][column] = row[column]/config.factor;
           });
+
+          if (i < trades) {
+            console.log('Setting up promise '+ i);
+            var promise = new Promise(function(resolve, reject) {
+              var ending_promise = i;
+              if (i-max_threads > 0) {
+                ending_promise = i-max_threads;
+              }
+
+              Promise.all(promises.slice(0, ending_promise)).then(function() {
+                var spawn = child_process.spawn;
+
+                py = spawn('python3', ['scripts/guess.py']);
+                dataString = '';
+
+                py.stdout.on('data', function(data) {
+                  dataString += data.toString();
+                });
+
+                py.stdout.on('error', function(error) {
+                  console.log(error);
+                });
+
+                py.stderr.on('data', function(data) {
+                    //console.error(data.toString());
+                });
+
+                py.stdout.on('end', function() {
+                  console.log('Output: '+dataString);
+                  const datas = dataString.split(/\r?\n/);
+                  guess = parseInt(datas[0]);
+                  weight = parseFloat(datas[1]);
+                  neural = parseFloat(datas[2]);
+
+                  if (isNaN(guess)) {
+                    guess = 0;
+                  }
+
+                  console.log('Guess '+i+' completed');
+                  console.timeLog('guesses');
+                  resolve([i, guess, weight, neural]);
+                });
+
+                py.stdin.write(JSON.stringify(row));
+                py.stdin.end();
+              });
+            });
+
+            promises.push(promise);
+          }
         });
 
-        //TODO: Put the guesses up here in it's own loop waiting for all promises to complete, in order to speed up without having to wait 2 seconds each iteration
+        Promise.all(promises).then(function(guesses) {
+          console.timeEnd('guesses');
 
-        //TODO: Figure out why 1 is coming before 0 sometimes
-        //TODO: Find why first two are NaN sometimes
-        var wait_time = 0;
-        rows.forEach(function(row, i) {
-          wait_time += 2000;
+          var ordered_guesses = {};
+          guesses.forEach(function(guess) {
+            ordered_guesses[guess[0]] = guess;
+          });
 
-          if (i >= trades) {
-            if (i === rows.length-1) {
-              setTimeout(function() {
+          console.log(ordered_guesses);
+
+          rows.forEach(function(row, i) {
+            if (i >= trades) {
+              if (i === rows.length-1) {
                 const trade_accuracy = (right_trades/trades)*100;
                 const total_profit = ((value*100)-(starting_value*100))/100;
                 const total_perfect_profit = ((perfect_value*100)-(starting_value*100))/100;
@@ -87,105 +143,75 @@ router.get('/', function(req, res) {
                 console.log('Finsihed');
                 console.log('');
                 console.log('Trade Accuracy: '+trade_accuracy+'%');
-                console.log('Profit Accuracy: '+profit_accuracy+'%');
-              }, wait_time);
+                console.log('Profit Accuracy: '+profit_accuracy+'%')
+              }
+
+              return;
             }
 
-            return;
-          }
+            guess = parseInt(ordered_guesses[i][1]);
+            weight = parseFloat(ordered_guesses[i][2]);
+            neural = parseFloat(ordered_guesses[i][3]);
 
-          setTimeout(function() {
-            var spawn = child_process.spawn;
+            const current_stock_price = ((rows[i+1].open*config.factor)+(rows[i+1].close*config.factor))/2/config.factor;
+            const future_stock_price = ((rows[i+2].open*config.factor)+(rows[i+2].close*config.factor))/2/config.factor;
 
-            py = spawn('python3', ['scripts/guess.py']);
-            dataString = '';
+            console.log('-------');
+            console.log(i);
+            console.log('Minute: '+moment(row.minute)
+              .add(1, 'minutes')
+              .format('YYYY-MM-DD HH:mm:00'));
+            console.log('Guess: '+guess);
+            console.log('Weight: '+weight);
+            console.log('Neural Prediction: '+neural);
+            console.log('Stock Price: '+current_stock_price);
+            console.log('Future Stock Price: '+future_stock_price);
+            console.log('');
 
-            py.stdout.on('data', function(data) {
-              dataString += data.toString();
-            });
+            const index_qty = Math.floor((index_value*4)/current_stock_price);
+            const index_purchase_amount = Math.ceil(index_qty*(current_stock_price*100))/100;
+            const index_sell_amount = Math.floor(index_qty*(future_stock_price*100))/100;
+            const index_profit = ((index_sell_amount*100)-(index_purchase_amount*100))/100;
+            index_value = ((index_value*100)+(index_profit*100))/100;
 
-            py.stdout.on('error', function(error) {
-              console.log(error);
-            });
+            const qty = Math.floor((value*4*0.9)/current_stock_price);
+            const purchase_amount = Math.ceil(qty*(current_stock_price*100))/100;
+            const sell_amount = Math.floor(qty*(future_stock_price*100))/100;
+            const profit = ((sell_amount*100)-(purchase_amount*100))/100;
 
-            /*py.stderr.on('data', function(data) {
-                console.error(data.toString());
-            });*/
+            if (guess === 1) {
+              console.log('Buying...');
+              console.log('Quantity: '+qty);
+              console.log('Purchase Amount: '+purchase_amount);
+              console.log('Sell Amount: '+sell_amount);
+              console.log('Profit: '+profit);
 
-            py.stdout.on('end', function() {
-              //console.log(dataString);
-              const datas = dataString.split(/\r?\n/);
-              guess = parseInt(datas[0]);
-              weight = parseFloat(datas[1]);
-              neural = parseFloat(datas[2]);
-
-              if (isNaN(guess)) {
-                guess = 0;
-              }
-
-              const current_stock_price = ((rows[i+1].open*config.factor)+(rows[i+1].close*config.factor))/2/config.factor;
-              const future_stock_price = ((rows[i+2].open*config.factor)+(rows[i+2].close*config.factor))/2/config.factor;
-
-              console.log('-------');
-              console.log(i);
-              console.log('Minute: '+moment(row.minute)
-                .add(1, 'minutes')
-                .format('YYYY-MM-DD HH:mm:00'));
-              console.log('Guess: '+guess);
-              console.log('Weight: '+weight);
-              console.log('Neural Prediction: '+neural);
-              console.log('Stock Price: '+current_stock_price);
-              console.log('Future Stock Price: '+future_stock_price);
-              console.log('');
-
-              const index_qty = Math.floor((index_value*4)/current_stock_price);
-              const index_purchase_amount = Math.ceil(index_qty*(current_stock_price*100))/100;
-              const index_sell_amount = Math.floor(index_qty*(future_stock_price*100))/100;
-              const index_profit = ((index_sell_amount*100)-(index_purchase_amount*100))/100;
-              index_value = ((index_value*100)+(index_profit*100))/100;
-
-              const qty = Math.floor((value*4*0.9)/current_stock_price);
-              const purchase_amount = Math.ceil(qty*(current_stock_price*100))/100;
-              const sell_amount = Math.floor(qty*(future_stock_price*100))/100;
-              const profit = ((sell_amount*100)-(purchase_amount*100))/100;
-
-              if (guess === 1) {
-                console.log('Buying...');
-                console.log('Quantity: '+qty);
-                console.log('Purchase Amount: '+purchase_amount);
-                console.log('Sell Amount: '+sell_amount);
-                console.log('Profit: '+profit);
-
-                if (profit >= 0) {
-                  perfect_value = ((perfect_value*100)+(profit*100))/100;
-                  right_trades += 1;
-                } else {
-                  bad_value = ((bad_value*100)+(profit*100))/100;
-                }
-
-                value = ((value*100)+(profit*100))/100;
+              if (profit >= 0) {
+                perfect_value = ((perfect_value*100)+(profit*100))/100;
+                right_trades += 1;
               } else {
-                console.log('Selling...');
-
-                if (profit >= 0) {
-                  perfect_value = ((perfect_value*100)+(profit*100))/100;
-                  missed_value = ((missed_value*100)+(profit*100))/100;
-                } else {
-                  right_trades += 1;
-                }
+                bad_value = ((bad_value*100)+(profit*100))/100;
               }
 
-              console.log('');
-              console.log('Index Value: $'+index_value);
-              console.log('Missed Value: $'+missed_value);
-              console.log('Bad Value: $'+bad_value);
-              console.log('Perfect Value: $'+perfect_value);
-              console.log('Value: $'+value);
-            });
+              value = ((value*100)+(profit*100))/100;
+            } else {
+              console.log('Selling...');
 
-            py.stdin.write(JSON.stringify(row));
-            py.stdin.end();
-          }, wait_time);
+              if (profit >= 0) {
+                perfect_value = ((perfect_value*100)+(profit*100))/100;
+                missed_value = ((missed_value*100)+(profit*100))/100;
+              } else {
+                right_trades += 1;
+              }
+            }
+
+            console.log('');
+            console.log('Index Value: $'+index_value);
+            console.log('Missed Value: $'+missed_value);
+            console.log('Bad Value: $'+bad_value);
+            console.log('Perfect Value: $'+perfect_value);
+            console.log('Value: $'+value);
+          });
         });
       });
     });
