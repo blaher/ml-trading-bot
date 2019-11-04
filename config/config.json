@@ -10,8 +10,8 @@
     "factor": 10000,
     "alpaca_endpoint": "https://paper-api.alpaca.markets",
     "alpaca": {
-      "keyId": "PKSOX8LWG20HSFJVWQR1",
-      "secretKey": "Im1nc2GYJL9/y9EX65iHjtDMQXf/EOUcvKJLL8GP",
+      "keyId": "PK938VFR5V1VUGSU0AGW",
+      "secretKey": "y2VwJBAPbPGXZDeP8Q2dgIhj0wZg9L6w4oKPAGqR",
       "paper": true
     },
     "logging": false
@@ -27,8 +27,8 @@
     "factor": 10000,
     "alpaca_endpoint": "https://paper-api.alpaca.markets",
     "alpaca": {
-      "keyId": "PKSOX8LWG20HSFJVWQR1",
-      "secretKey": "Im1nc2GYJL9/y9EX65iHjtDMQXf/EOUcvKJLL8GP",
+      "keyId": "PK938VFR5V1VUGSU0AGW",
+      "secretKey": "y2VwJBAPbPGXZDeP8Q2dgIhj0wZg9L6w4oKPAGqR",
       "paper": true
     },
     "logging": false
@@ -44,8 +44,8 @@
     "factor": 10000,
     "alpaca_endpoint": "https://paper-api.alpaca.markets",
     "alpaca": {
-      "keyId": "PKSOX8LWG20HSFJVWQR1",
-      "secretKey": "Im1nc2GYJL9/y9EX65iHjtDMQXf/EOUcvKJLL8GP",
+      "keyId": "PK938VFR5V1VUGSU0AGW",
+      "secretKey": "y2VwJBAPbPGXZDeP8Q2dgIhj0wZg9L6w4oKPAGqR",
       "paper": true
     },
     "logging": false
