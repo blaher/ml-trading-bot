@@ -148,11 +148,11 @@ function load_init(models) {
 
                     console.timeLog('alpaca-2');
                     if (get_upper_minute().isSameOrBefore(get_minute_moment(current_minute))) {
-                      alpaca.getPosition(index.symbol).then(function(position) {
-                        console.timeLog('alpaca-2');
-                        console.log('Selling all: '+position.qty);
+                      alpaca.cancelAllOrders().then(function() {
+                        alpaca.getPosition(index.symbol).then(function(position) {
+                          console.timeLog('alpaca-2');
+                          console.log('Selling all: '+position.qty);
 
-                        alpaca.cancelAllOrders().then(function() {
                           alpaca.createOrder({
                             symbol: index.symbol,
                             qty: position.qty,
@@ -160,9 +160,9 @@ function load_init(models) {
                             type: 'market',
                             time_in_force: 'day'
                           });
+                        }, function() {
+                          console.log('No stocks to sell');
                         });
-                      }, function() {
-                        console.log('No stocks to sell');
                       });
                     } else if (guess) {
                       var qty = Math.floor(amount/current_stock_price);
@@ -200,10 +200,10 @@ function load_init(models) {
                         console.log('Not enough moneys')
                       }
                     } else {
-                      alpaca.getPosition(index.symbol).then(function(position) {
-                        console.log('Selling: '+position.qty);
+                      alpaca.cancelAllOrders().then(function() {
+                        alpaca.getPosition(index.symbol).then(function(position) {
+                          console.log('Selling: '+position.qty);
 
-                        alpaca.cancelAllOrders().then(function() {
                           alpaca.createOrder({
                             symbol: index.symbol,
                             qty: position.qty,
@@ -211,9 +211,9 @@ function load_init(models) {
                             type: 'market',
                             time_in_force: 'day'
                           });
+                        }, function() {
+                          console.log('No stocks to sell');
                         });
-                      }, function() {
-                        console.log('No stocks to sell');
                       });
                     }
                   });
