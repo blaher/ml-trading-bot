@@ -177,12 +177,12 @@ function load_init(models) {
                           type: 'market',
                           time_in_force: 'day'
                         }).then(function(order) {
-                          //TODO: Get better limit price
-                          const increase = ((0.05*100)*(weight*100))/10000;
+                          //TODO: Get better increase
+                          const increase = ((0.02*100)*(weight*100))/10000;
                           console.log('Increase: '+increase);
 
                           wait_for_order(order.id, qty, function(filled_order) {
-                            const limit_price = (parseFloat(filled_order.filled_avg_price))+(increase*100)/100;
+                            const limit_price = ((parseFloat(filled_order.filled_avg_price)*100)+(increase*100))/100;
                             console.log('Filled Price: '+filled_order.filled_avg_price);
                             console.log('Limit Price: '+limit_price);
 
