@@ -35,12 +35,26 @@ function get_upper_minute() {
   return get_max_minute().subtract(1, 'minutes');
 }
 
+function wait_for_order(order_id, qty, callback) {
+  console.log('Waiting...');
+  alpaca.getOrder(order_id).then(function(order) {
+    if (order.filled_at && qty == order.filled_qty) {
+      callback(order);
+    } else {
+      wait_for_order(order_id, qty, callback);
+    }
+  });
+}
+
 function load_init(models) {
   console.log('-------');
   const current_minute = get_minute();
+  console.timeEnd('alpaca-1');
+  console.time('alpaca-1');
   console.log('Current Minute: '+current_minute);
 
   alpaca.getClock().then(function(clock) {
+    console.timeLog('alpaca-1');
     if (clock.is_open) {
       models.Indexes.findAll({
         include: [models.Indicators, models.Stocks]
@@ -89,7 +103,8 @@ function load_init(models) {
             });
 
             try {
-              console.timeStart('prediction');
+              console.timeEnd('prediction');
+              console.time('prediction');
               var spawn = child_process.spawn;
 
               py = spawn('python3', ['scripts/guess.py']);
@@ -104,7 +119,7 @@ function load_init(models) {
               });
 
               py.stdout.on('end', function() {
-                console.timeEnd('prediction');
+                console.timeLog('prediction');
 
                 const datas = dataString.split(/\r?\n/);
                 guess = parseInt(datas[0]);
@@ -119,6 +134,8 @@ function load_init(models) {
                   guess = 0;
                 }
 
+                console.timeEnd('alpaca-2')
+                console.time('alpaca-2');
                 alpaca.getAccount().then(function(account) {
                   amount = account.buying_power*0.9;
                   console.log('Amount: '+amount);
@@ -129,16 +146,20 @@ function load_init(models) {
                     current_stock_price = latest_bars[index.symbol][0].c;
                     //console.log('Stock Price: '+current_stock_price);
 
+                    console.timeLog('alpaca-2');
                     if (get_upper_minute().isSameOrBefore(get_minute_moment(current_minute))) {
                       alpaca.getPosition(index.symbol).then(function(position) {
+                        console.timeLog('alpaca-2');
                         console.log('Selling all: '+position.qty);
 
-                        alpaca.createOrder({
-                          symbol: index.symbol,
-                          qty: position.qty,
-                          side: 'sell',
-                          type: 'market',
-                          time_in_force: 'day'
+                        alpaca.cancelAllOrders().then(function() {
+                          alpaca.createOrder({
+                            symbol: index.symbol,
+                            qty: position.qty,
+                            side: 'sell',
+                            type: 'market',
+                            time_in_force: 'day'
+                          });
                         });
                       }, function() {
                         console.log('No stocks to sell');
@@ -155,6 +176,25 @@ function load_init(models) {
                           side: 'buy',
                           type: 'market',
                           time_in_force: 'day'
+                        }).then(function(order) {
+                          //TODO: Get better limit price
+                          const increase = ((0.05*100)*(weight*100))/10000;
+                          console.log('Increase: '+increase);
+
+                          wait_for_order(order.id, qty, function(filled_order) {
+                            const limit_price = (parseFloat(filled_order.filled_avg_price))+(increase*100)/100;
+                            console.log('Filled Price: '+filled_order.filled_avg_price);
+                            console.log('Limit Price: '+limit_price);
+
+                            alpaca.createOrder({
+                              symbol: index.symbol,
+                              qty: qty,
+                              side: 'sell',
+                              type: 'limit',
+                              time_in_force: 'day',
+                              limit_price: limit_price
+                            });
+                          });
                         });
                       } else {
                         console.log('Not enough moneys')
@@ -163,12 +203,14 @@ function load_init(models) {
                       alpaca.getPosition(index.symbol).then(function(position) {
                         console.log('Selling: '+position.qty);
 
-                        alpaca.createOrder({
-                          symbol: index.symbol,
-                          qty: position.qty,
-                          side: 'sell',
-                          type: 'market',
-                          time_in_force: 'day'
+                        alpaca.cancelAllOrders().then(function() {
+                          alpaca.createOrder({
+                            symbol: index.symbol,
+                            qty: position.qty,
+                            side: 'sell',
+                            type: 'market',
+                            time_in_force: 'day'
+                          });
                         });
                       }, function() {
                         console.log('No stocks to sell');
