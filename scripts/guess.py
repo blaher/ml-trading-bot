@@ -89,11 +89,11 @@ saver = tf.compat.v1.train.Saver()
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.compat.v1.Session(config=config) as net:
-    saver.restore(net, 'models/neural')
+    saver.restore(net, 'algorithms/neural-indicator')
     df = pd.DataFrame(stock_data, columns=stock_data.keys(), index=[0])
     data['neural_prediction'] = net.run(out, feed_dict={X: df})[0][0]
 
-clf = load('models/tree.joblib')
+clf = load('algorithms/tree-direction.joblib')
 df = pd.DataFrame(data, columns=data.keys(), index=[0])
 
 prediction = clf.predict(df)[0]

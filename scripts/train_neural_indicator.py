@@ -146,7 +146,7 @@ while 1 == 1:
         plt.title('Epoch ' + str(e))
         plt.pause(0.01)
 
-        saver.save(net, 'models/neural')
+        saver.save(net, 'algorithms/neural-indicator')
 
         first = 0
 

@@ -163,7 +163,7 @@ out = tf.transpose(tf.add(tf.matmul(hidden_4, W_out), bias_out))
 tf.global_variables_initializer()
 saver = tf.compat.v1.train.Saver()
 with tf.Session() as net:
-    saver.restore(net, 'models/neural')
+    saver.restore(net, 'algorithms/neural-indicator')
     data = insert_neural(data, net, out)
 
 data = data.dropna(axis=0)
@@ -219,7 +219,7 @@ def predict_thread(nodes, train_x, test_x, train_y, test_y):
     if errors < lowest_errors:
         lowest_errors = errors
 
-        dump(model, 'models/tree.joblib')
+        dump(model, 'algorithms/tree-direction.joblib')
 
         #print("Current Lowest Errors: ", errors)
         #print("Current Lowest Error Nodes: ", nodes)
