@@ -16,9 +16,9 @@ router.get('/', function(req, res) {
     indexes.forEach(function(index) {
       console.log('Data: '+index.symbol);
 
-      var select = 'ip.minute, ip.futurePrice';
-      var header = 'minute, futurePrice';
-      var columns = ['minute', 'futurePrice'];
+      var select = 'ip.minute, ip.futureClose';
+      var header = 'minute, futureClose';
+      var columns = ['minute', 'futureClose'];
 
       index.Stocks.forEach(function(stock) {
         if (stock.symbol !== 'GL') {
@@ -30,7 +30,7 @@ router.get('/', function(req, res) {
         }
       });
 
-      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? AND ip.futurePrice IS NOT NULL ORDER BY ip.minute;';
+      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? AND ip.futureClose IS NOT NULL ORDER BY ip.minute;';
 
       models.sequelize.query(sql, {
         replacements: [index.id],

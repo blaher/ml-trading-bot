@@ -42,7 +42,7 @@ module.exports = {
           allowNull: false,
           type: Sequelize.INTEGER.UNSIGNED
         },
-        futurePrice: {
+        futureClose: {
           type: Sequelize.INTEGER.UNSIGNED
         },
         createdAt: {

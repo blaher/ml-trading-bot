@@ -6,10 +6,10 @@ const express = require('express');
 const router = express.Router();
 
 function load_init(models) {
-  const sql_sell = 'UPDATE IndexPrices SET trade = \'sell\' WHERE futurePrice IS NOT NULL AND trade IS NULL AND close > futurePrice;';
+  const sql_sell = 'UPDATE IndexPrices SET trade = \'sell\' WHERE futureClose IS NOT NULL AND trade IS NULL AND close > futureClose;';
   models.sequelize.query(sql_sell, {});
 
-  const sql_buy = 'UPDATE IndexPrices SET trade = \'buy\' WHERE futurePrice IS NOT NULL AND trade IS NULL AND close <= futurePrice;';
+  const sql_buy = 'UPDATE IndexPrices SET trade = \'buy\' WHERE futureClose IS NOT NULL AND trade IS NULL AND close <= futureClose;';
   models.sequelize.query(sql_buy, {});
 }
 

@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.INTEGER.UNSIGNED
     },
-    futurePrice: {
+    futureClose: {
       type: DataTypes.INTEGER.UNSIGNED
     },
     trade: DataTypes.ENUM('sell', 'buy')

@@ -57,7 +57,7 @@ function get_previous_minute(minute) {
 
 function get_minute_to_update(minute) {
   //TODO: Consider Weekends and Holidays too
-  //TODO: Fix futurePrice skip on new day
+  //TODO: Fix futureClose skip on new day
   const minute_moment = get_minute_moment(minute);
 
   if (minute_moment.isSame(get_min_minute())) {
@@ -100,7 +100,7 @@ function get_indicator_data(data, symbol) {
 }
 
 function get_previous_data(converted_data) {
-  return {futurePrice: converted_data['close']};
+  return {futureClose: converted_data['close']};
 }
 
 function record_stock(table, object, minute, update_previous=false) {

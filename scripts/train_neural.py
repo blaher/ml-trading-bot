@@ -13,8 +13,8 @@ simplefilter(action='ignore', category=FutureWarning)
 # Import data
 data = pd.read_csv('data/SPY_neural.csv', delimiter=', ', encoding="utf-8-sig")
 print(data)
-y_min = data['futurePrice'].min()
-y_max = data['futurePrice'].max()
+y_min = data['futureClose'].min()
+y_max = data['futureClose'].max()
 
 # Drop minute variable
 data = data.drop(['minute'], 1)
