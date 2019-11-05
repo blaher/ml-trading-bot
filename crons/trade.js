@@ -37,12 +37,45 @@ function get_upper_minute() {
 
 function wait_for_order(order_id, qty, callback) {
   console.log('Waiting...');
-  alpaca.getOrder(order_id).then(function(order) {
-    if (order.filled_at && qty == order.filled_qty) {
-      callback(order);
-    } else {
-      wait_for_order(order_id, qty, callback);
-    }
+
+  setTimeout(function() {
+    alpaca.getOrder(order_id).then(function(order) {
+      if (order.filled_at && qty == order.filled_qty) {
+        callback(order);
+      } else {
+        wait_for_order(order_id, qty, callback);
+      }
+    });
+  }, 1000);
+}
+
+function wait_for_no_orders(callback) {
+  console.log('Waiting...');
+
+  setTimeout(function() {
+    alpaca.getOrders({
+      status: 'open',
+      after: moment().subtract(1, 'days').format('YYYY-MM-DD'),
+      until: moment().add(1, 'days').format('YYYY-MM-DD'),
+      limit: 1,
+      direction: 'asc'
+    }).then(function(orders) {
+      if (orders.length > 0) {
+        wait_for_no_orders(callback);
+      } else {
+        callback();
+      }
+    });
+  }, 1000);
+}
+
+function sell_all() {
+  alpaca.cancelAllOrders().then(function() {
+    wait_for_no_orders(function() {
+      console.log('Selling All Positions');
+
+      alpaca.closeAllPositions();
+    });
   });
 }
 
@@ -148,11 +181,7 @@ function load_init(models) {
 
                     console.timeLog('alpaca-2');
                     if (get_upper_minute().isSameOrBefore(get_minute_moment(current_minute))) {
-                      alpaca.cancelAllOrders().then(function() {
-                        console.log('Selling All Positions');
-
-                        alpaca.closeAllPositions();
-                      });
+                      sell_all();
                     } else if (guess) {
                       var qty = Math.floor(amount/current_stock_price);
 
@@ -189,11 +218,7 @@ function load_init(models) {
                         console.log('Not enough moneys')
                       }
                     } else {
-                      alpaca.cancelAllOrders().then(function() {
-                        console.log('Selling All Positions');
-                        
-                        alpaca.closeAllPositions();
-                      });
+                      sell_all();
                     }
                   });
                 });
