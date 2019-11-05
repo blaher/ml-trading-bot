@@ -100,7 +100,10 @@ function get_indicator_data(data, symbol) {
 }
 
 function get_previous_data(converted_data) {
-  return {futureClose: converted_data['close']};
+  return {
+    futureClose: converted_data['close'],
+    futureHigh: converted_data['high'],
+  };
 }
 
 function record_stock(table, object, minute, update_previous=false) {
