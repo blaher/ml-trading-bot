@@ -4,5 +4,5 @@ cron:
    url: "/crons/collect"
    schedule: "* 13-20 * * 1-5"
  - name: "update_trade_decisions"
-   url: "/crons/update_trade_decisions"
+   url: "/crons/update"
    schedule: "05 20 * * 1-5"
