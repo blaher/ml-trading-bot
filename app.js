@@ -8,16 +8,18 @@ var app = express();
 
 //TODO: Autoload these
 var crons_collect = require('./crons/collect');
-var crons_data_neural = require('./crons/data_neural');
-var crons_data_tree = require('./crons/data_tree');
+var crons_data_neural_difference = require('./crons/data_neural_difference');
+var crons_data_neural_indicator = require('./crons/data_neural_indicator');
+var crons_data_tree_direction = require('./crons/data_tree_direction');
 var crons_get_test_data = require('./crons/get_test_data');
 var crons_test = require('./crons/test');
 var crons_trade = require('./crons/trade');
 var crons_update = require('./crons/update');
 
 app.use('/crons/collect', crons_collect);
-app.use('/crons/data_neural', crons_data_neural);
-app.use('/crons/data_tree', crons_data_tree);
+app.use('/crons/data_neural_difference', crons_data_neural_difference);
+app.use('/crons/data_neural_indicator', crons_data_neural_indicator);
+app.use('/crons/data_tree_direction', crons_data_tree_direction);
 app.use('/crons/get_test_data', crons_get_test_data);
 app.use('/crons/test', crons_test);
 app.use('/crons/trade', crons_trade);

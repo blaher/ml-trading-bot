@@ -62,9 +62,10 @@ typings/
 
 # python3
 venv
-models/tree.joblib
-models/checkpoint
-models/neural.*
-data/SPY_neural.csv
-data/SPY_tree.csv
+algorithms/tree-*
+algorithms/checkpoint
+algorithms/neural-*
+data/SPY_neural_indicator.csv
+data/SPY_neural_difference.csv
+data/SPY_tree_direction.csv
 data/test_results.txt

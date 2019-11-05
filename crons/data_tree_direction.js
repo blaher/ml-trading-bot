@@ -10,15 +10,36 @@ const moment = require('moment');
 const fs = require('fs');
 
 router.get('/', function(req, res) {
-  console.log('Starting Neural Data...');
+  console.log('Starting Tree Data...');
 
-  models.Indexes.findAll({include: [models.Stocks]}).then(function(indexes) {
+  models.Indexes.findAll({
+    include: [models.Indicators, models.Stocks]
+  }).then(function(indexes) {
     indexes.forEach(function(index) {
       console.log('Data: '+index.symbol);
 
-      var select = 'ip.minute, ip.futureClose';
-      var header = 'minute, futureClose';
-      var columns = ['minute', 'futureClose'];
+      var select = 'ip.minute';
+      select += ', ip.trade-1 as trade';
+      select += ', ip.open, ip.high, ip.low, ip.close';
+      var header = 'minute, trade, open, high, low, close';
+      var columns = ['minute', 'trade', 'open', 'high', 'low', 'close'];
+
+      index.Indicators.forEach(function(indicator) {
+        if (!indicator.values) {
+          indicator.values = 1;
+        }
+
+        var i = 1;
+        while (i <= indicator.values) {
+          select += ', (SELECT iiv.value'+i+' FROM IndexIndicatorValues AS iiv WHERE iiv.indicatorId = '+indicator.id+' AND iiv.indexId = ip.indexId AND iiv.minute = ip.minute) AS indicator_'+indicator.symbol+'_value'+i;
+
+          header += ', indicator_'+indicator.symbol+'_value'+i;
+
+          columns.push('indicator_'+indicator.symbol+'_value'+i);
+
+          i++;
+        }
+      });
 
       index.Stocks.forEach(function(stock) {
         if (stock.symbol !== 'GL') {
@@ -30,7 +51,7 @@ router.get('/', function(req, res) {
         }
       });
 
-      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? AND ip.futureClose IS NOT NULL ORDER BY ip.minute;';
+      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? AND ip.trade IS NOT NULL ORDER BY ip.minute;';
 
       models.sequelize.query(sql, {
         replacements: [index.id],
@@ -51,13 +72,15 @@ router.get('/', function(req, res) {
 
             if (column === 'minute') {
               content += moment(row[column]).format('YYYY-MM-DD HH:mm:00');
+            } else if (column === 'trade') {
+              content += row[column];
             } else {
               content += row[column]/config.factor;
             }
           });
         });
 
-        fs.writeFile('data/'+index.symbol+'_neural.csv', content, function(err) {
+        fs.writeFile('data/'+index.symbol+'_tree_direction.csv', content, function(err) {
           if (err) {
             console.log(err);
           }
@@ -68,7 +91,7 @@ router.get('/', function(req, res) {
     });
   });
 
-  console.log('Finished Neural Data');
+  console.log('Finished Tree Data');
 
   res.sendStatus(200);
 });
