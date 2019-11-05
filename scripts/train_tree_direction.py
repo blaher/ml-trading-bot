@@ -113,7 +113,7 @@ def insert_neural(data, net, out):
 
     return data
 
-file_path = 'data/SPY_tree.csv'
+file_path = 'data/SPY_tree_direction.csv'
 data = pandas.read_csv(file_path, skipinitialspace=True)
 
 stock_data = data.drop(features, axis=1)

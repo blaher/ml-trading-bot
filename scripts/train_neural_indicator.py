@@ -11,7 +11,7 @@ from warnings import simplefilter
 simplefilter(action='ignore', category=FutureWarning)
 
 # Import data
-data = pd.read_csv('data/SPY_neural.csv', delimiter=', ', encoding="utf-8-sig")
+data = pd.read_csv('data/SPY_neural_indicator.csv', delimiter=', ', encoding="utf-8-sig")
 print(data)
 y_min = data['futureClose'].min()
 y_max = data['futureClose'].max()
