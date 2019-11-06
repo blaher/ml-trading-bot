@@ -170,7 +170,7 @@ function load_init(models) {
                 console.timeEnd('alpaca-2')
                 console.time('alpaca-2');
                 alpaca.getAccount().then(function(account) {
-                  amount = account.buying_power*0.9;
+                  amount = account.cash*0.9;
                   console.log('Amount: '+amount);
 
                   alpaca.getBars('minute', index.symbol, {
