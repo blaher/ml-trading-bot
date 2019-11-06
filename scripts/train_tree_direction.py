@@ -67,7 +67,6 @@ features = [
   'indicator_BBANDS_value3',
   'indicator_MIDPOINT_value1',
   'indicator_MIDPRICE_value1',
-  'indicator_MIDPRICE_value2',
   'indicator_SAR_value1',
   'indicator_TRANGE_value1',
   'indicator_ATR_value1',

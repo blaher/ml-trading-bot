@@ -17,6 +17,7 @@ router.get('/', function(req, res) {
       console.log('Data: '+index.symbol);
 
       var select = 'ip.minute, ip.futureClose';
+      var where = 'ip.indexId = ? AND ip.futureClose';
       var header = 'minute, futureClose';
       var columns = ['minute', 'futureClose'];
 
@@ -24,13 +25,15 @@ router.get('/', function(req, res) {
         if (stock.symbol !== 'GL') {
           select += ', (SELECT sp.close FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_close';
 
+          where += ' AND (SELECT sp.close FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) IS NOT NULL';
+
           header += ', stock_'+stock.symbol+'_close'
 
           columns.push('stock_'+stock.symbol+'_close');
         }
       });
 
-      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? AND ip.futureClose IS NOT NULL ORDER BY ip.minute;';
+      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE '+where+' IS NOT NULL ORDER BY ip.minute;';
 
       models.sequelize.query(sql, {
         replacements: [index.id],

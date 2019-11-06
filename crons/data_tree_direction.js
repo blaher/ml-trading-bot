@@ -21,6 +21,7 @@ router.get('/', function(req, res) {
       var select = 'ip.minute';
       select += ', ip.trade-1 as trade';
       select += ', ip.open, ip.high, ip.low, ip.close';
+      var where = 'ip.indexId = ? AND ip.trade IS NOT NULL';
       var header = 'minute, trade, open, high, low, close';
       var columns = ['minute', 'trade', 'open', 'high', 'low', 'close'];
 
@@ -32,6 +33,8 @@ router.get('/', function(req, res) {
         var i = 1;
         while (i <= indicator.values) {
           select += ', (SELECT iiv.value'+i+' FROM IndexIndicatorValues AS iiv WHERE iiv.indicatorId = '+indicator.id+' AND iiv.indexId = ip.indexId AND iiv.minute = ip.minute) AS indicator_'+indicator.symbol+'_value'+i;
+
+          //where += ' AND (SELECT iiv.value'+i+' FROM IndexIndicatorValues AS iiv WHERE iiv.indicatorId = '+indicator.id+' AND iiv.indexId = ip.indexId AND iiv.minute = ip.minute) IS NOT NULL';
 
           header += ', indicator_'+indicator.symbol+'_value'+i;
 
@@ -45,13 +48,15 @@ router.get('/', function(req, res) {
         if (stock.symbol !== 'GL') {
           select += ', (SELECT sp.close FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) AS stock_'+stock.symbol+'_close';
 
+          where += ' AND (SELECT sp.close FROM StockPrices AS sp WHERE sp.stockId = '+stock.id+' AND sp.minute = ip.minute) IS NOT NULL';
+
           header += ', stock_'+stock.symbol+'_close'
 
           columns.push('stock_'+stock.symbol+'_close');
         }
       });
 
-      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE ip.indexId = ? AND ip.trade IS NOT NULL ORDER BY ip.minute;';
+      var sql = 'SELECT '+select+' FROM IndexPrices AS ip WHERE '+where+' ORDER BY ip.minute;';
 
       models.sequelize.query(sql, {
         replacements: [index.id],
