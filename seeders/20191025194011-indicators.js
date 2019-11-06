@@ -1,5 +1,6 @@
 'use strict';
 
+//TODO: Add values to all of these
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('Indicators', [
@@ -288,7 +289,6 @@ module.exports = {
         id: 40,
         symbol: 'MIDPRICE',
         name: 'Midpoint Price',
-        values: 2,
         createdAt: new Date(),
         updatedAt: new Date()
       },
