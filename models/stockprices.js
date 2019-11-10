@@ -30,6 +30,12 @@ module.exports = (sequelize, DataTypes) => {
     close: {
       allowNull: false,
       type: DataTypes.INTEGER.UNSIGNED
+    },
+    previousHighDifference: {
+      type: DataTypes.INTEGER
+    },
+    previousCloseDifference: {
+      type: DataTypes.INTEGER
     }
   }, {
     indexes: [

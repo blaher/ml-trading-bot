@@ -8,7 +8,7 @@ module.exports = {
         'StockPrices',
         'previousHighDifference',
         {
-          type: Sequelize.INTEGER.UNSIGNED
+          type: Sequelize.INTEGER
         },
         { transaction }
       );

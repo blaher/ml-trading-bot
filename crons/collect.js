@@ -74,14 +74,23 @@ function get_minute_to_update(minute) {
   }
 }
 
-function get_converted_data(data) {
-  return {
+function get_converted_data(data, previous_data) {
+  var result = {
     open: data['1. open']*config.factor,
     high: data['2. high']*config.factor,
     low: data['3. low']*config.factor,
     close: data['4. close']*config.factor,
     volume: data['5. volume']
   };
+
+  if (previous_data && previous_data['2. high']) {
+    result['previousHighDifference'] = (data['2. high']*config.factor)-(previous_data['2. high']*config.factor);
+  }
+  if (previous_data && previous_data['4. close']) {
+    result['previousCloseDifference'] = (data['4. close']*config.factor)-(previous_data['4. close']*config.factor);
+  }
+
+  return result;
 }
 
 function get_indicator_data(data, symbol) {
@@ -129,7 +138,8 @@ function record_stock(table, object, minute, update_previous=false) {
     const label = 'Time Series (1min)';
     if (rest_res.body && rest_res.body[label] && rest_res.body[label][minute]) {
       const data = rest_res.body[label][minute];
-      var converted_data = get_converted_data(data);
+      const previous_minute_data = rest_res.body[label][previous_minute];
+      var converted_data = get_converted_data(data, previous_minute_data);
       const previous_data = get_previous_data(converted_data);
 
       if (table === 'IndexPrices') {
