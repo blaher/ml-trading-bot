@@ -196,21 +196,27 @@ function load_init(models) {
                           time_in_force: 'day'
                         }).then(function(order) {
                           //TODO: Get better increase
-                          const increase = ((0.02*100)*(weight*100))/10000;
+                          const increase = ((0.03*100)*(weight*100))/10000;
                           console.log('Increase: '+increase);
 
                           wait_for_order(order.id, qty, function(filled_order) {
-                            const limit_price = ((parseFloat(filled_order.filled_avg_price)*100)+(increase*100))/100;
-                            console.log('Filled Price: '+filled_order.filled_avg_price);
-                            console.log('Limit Price: '+limit_price);
+                            alpaca.cancelAllOrders().then(function() {
+                              wait_for_no_orders(function() {
+                                const limit_price = ((parseFloat(filled_order.filled_avg_price)*100)+(increase*100))/100;
+                                console.log('Filled Price: '+filled_order.filled_avg_price);
+                                console.log('Limit Price: '+limit_price);
 
-                            alpaca.createOrder({
-                              symbol: index.symbol,
-                              qty: qty,
-                              side: 'sell',
-                              type: 'limit',
-                              time_in_force: 'day',
-                              limit_price: limit_price
+                                alpaca.getPosition(index.symbol).then(function(position) {
+                                  alpaca.createOrder({
+                                    symbol: index.symbol,
+                                    qty: position.qty,
+                                    side: 'sell',
+                                    type: 'limit',
+                                    time_in_force: 'day',
+                                    limit_price: limit_price
+                                  });
+                                });
+                              });
                             });
                           });
                         });
