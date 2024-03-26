@@ -24,7 +24,7 @@
   "dependencies": {
     "@alpacahq/alpaca-trade-api": "^1.2.4",
     "child_process": "^1.0.2",
-    "express": "^4.17.1",
+    "express": "^4.19.2",
     "moment": "^2.24.0",
     "mysql2": "^1.7.0",
     "sequelize": "^5.21.1",
